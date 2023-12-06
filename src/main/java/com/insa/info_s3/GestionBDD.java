@@ -64,52 +64,70 @@ public class GestionBDD {
     }
 }
   //méthode de création d'un nouveau produit 
-   public static void createProduit(Connection con, String ref, String des, int puissance) throws SQLException {
-    String sql = "INSERT INTO produit (ref, des, puissance) VALUES (?, ?, ?)"; 
+   public static void createProduit(Connection con, String ref, String des) throws SQLException {
+    String sql = "INSERT INTO produit (ref, des) VALUES (?, ?)"; 
     try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
         preparedStatement.setString(1, ref);
         preparedStatement.setString(2, des);
-        preparedStatement.setInt(3, puissance);
 
         preparedStatement.executeUpdate();
-        System.out.println("Machine créée avec succès !");
+        System.out.println("Produit créée avec succès !");
     }
 }
     //Ici suppresion d'un produit 
-  public static void deleteProduit(Connection con, int machineId) throws SQLException {
+  public static void deleteProduit(Connection con, int produitID) throws SQLException {
     String sql = "DELETE FROM produit WHERE id = ?";
     try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-        preparedStatement.setInt(1, machineId);
+        preparedStatement.setInt(1, produitID);
         int rowCount = preparedStatement.executeUpdate();
         if (rowCount > 0) {
             System.out.println("Produit supprimée avec succès !");
         } else {
-            System.out.println("Aucune Produit trouvée avec l'ID : " + machineId);
+            System.out.println("Aucune Produit trouvée avec l'ID : " + produitID);
+        }
+    }
+}
+   public static void createRealise(Connection con, long durée) throws SQLException {
+    String sql = "INSERT INTO produit (durée) VALUES (?)"; 
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setLong(1, durée);
+
+        preparedStatement.executeUpdate();
+        System.out.println("Lien créée avec succès !");
+    }
+}
+    //Ici suppresion d'un produit 
+  public static void deleteRealise(Connection con, int realiseID) throws SQLException {
+    String sql = "DELETE FROM produit WHERE id = ?";
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setInt(1, realiseID);
+        int rowCount = preparedStatement.executeUpdate();
+        if (rowCount > 0) {
+            System.out.println("lien supprimée avec succès !");
+        } else {
+            System.out.println("Aucune lien trouvée avec l'ID : " + realiseID);
         }
     }
 }
     //ici Création d'une nouvelle opération
-     public static void createOperation(Connection con, String ref, String des, int puissance) throws SQLException {
-    String sql = "INSERT INTO produit (ref, des, puissance) VALUES (?, ?, ?)"; 
+     public static void createTypeOperation(Connection con, String des) throws SQLException {
+    String sql = "INSERT INTO produit (des) VALUES (?)"; 
     try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-        preparedStatement.setString(1, ref);
         preparedStatement.setString(2, des);
-        preparedStatement.setInt(3, puissance);
-
         preparedStatement.executeUpdate();
-        System.out.println("Opération créée avec succès !");
+        System.out.println("TypeOpération créée avec succès !");
     }
 }
     //Ici suppresion d'une opération 
-  public static void deleteOperation(Connection con, int machineId) throws SQLException {
+  public static void deleteOperation(Connection con, int TypeoperationID) throws SQLException {
     String sql = "DELETE FROM produit WHERE id = ?";
     try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-        preparedStatement.setInt(1, machineId);
+        preparedStatement.setInt(1, TypeoperationID);
         int rowCount = preparedStatement.executeUpdate();
         if (rowCount > 0) {
-            System.out.println("Opération supprimée avec succès !");
+            System.out.println("Le Type Opération supprimée avec succès !");
         } else {
-            System.out.println("Aucune opération trouvée avec l'ID : " + machineId);
+            System.out.println("Aucun type opération trouvée avec l'ID : " + TypeoperationID);
         }
     }
 }
