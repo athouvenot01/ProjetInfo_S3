@@ -40,14 +40,11 @@ public class GestionBDD {
  //Création des méthodes liées à la Table Machine 
     //Ici c'est la création de machine en fonction des différentes colonnes de la table
   public static void createMachine(Connection con, String ref, String des, int puissance) throws SQLException {
-       int newMachineId = getFirstAvailableId(con,"machine");
-
-    String sql = "INSERT INTO machine (id, ref, des, puissance) VALUES (?, ?, ?, ?)"; 
+    String sql = "INSERT INTO machine (ref, des, puissance) VALUES (?, ?, ?)"; 
     try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-        preparedStatement.setInt(1, 3); // Id statique de 5, vous pouvez ajuster selon vos besoins
-        preparedStatement.setString(2, ref);
-        preparedStatement.setString(3, des);
-        preparedStatement.setInt(4, puissance);
+        preparedStatement.setString(1, ref);
+        preparedStatement.setString(2, des);
+        preparedStatement.setInt(3, puissance);
 
         preparedStatement.executeUpdate();
         System.out.println("Machine créée avec succès !");
@@ -66,21 +63,55 @@ public class GestionBDD {
         }
     }
 }
-private static int getFirstAvailableId(Connection con, String tableName) throws SQLException {
-    String sql = "SELECT MIN(id + 1) FROM " + tableName + " WHERE NOT EXISTS (SELECT 1 FROM " + tableName + " WHERE id = id + 1)";
-    try (Statement statement = con.createStatement();
-         ResultSet resultSet = statement.executeQuery(sql)) {
+  //méthode de création d'un nouveau produit 
+   public static void createProduit(Connection con, String ref, String des, int puissance) throws SQLException {
+    String sql = "INSERT INTO produit (ref, des, puissance) VALUES (?, ?, ?)"; 
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setString(1, ref);
+        preparedStatement.setString(2, des);
+        preparedStatement.setInt(3, puissance);
 
-        if (resultSet.next()) {
-            int availableId = resultSet.getInt(1);
-            if (availableId > 0) {
-                return availableId;
-            }
+        preparedStatement.executeUpdate();
+        System.out.println("Machine créée avec succès !");
+    }
+}
+    //Ici suppresion d'un produit 
+  public static void deleteProduit(Connection con, int machineId) throws SQLException {
+    String sql = "DELETE FROM produit WHERE id = ?";
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setInt(1, machineId);
+        int rowCount = preparedStatement.executeUpdate();
+        if (rowCount > 0) {
+            System.out.println("Produit supprimée avec succès !");
+        } else {
+            System.out.println("Aucune Produit trouvée avec l'ID : " + machineId);
         }
     }
+}
+    //ici Création d'une nouvelle opération
+     public static void createOperation(Connection con, String ref, String des, int puissance) throws SQLException {
+    String sql = "INSERT INTO produit (ref, des, puissance) VALUES (?, ?, ?)"; 
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setString(1, ref);
+        preparedStatement.setString(2, des);
+        preparedStatement.setInt(3, puissance);
 
-    // Si aucun ID disponible n'est trouvé, retournez 1 (par exemple)
-    return 1;
+        preparedStatement.executeUpdate();
+        System.out.println("Opération créée avec succès !");
+    }
+}
+    //Ici suppresion d'une opération 
+  public static void deleteOperation(Connection con, int machineId) throws SQLException {
+    String sql = "DELETE FROM produit WHERE id = ?";
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setInt(1, machineId);
+        int rowCount = preparedStatement.executeUpdate();
+        if (rowCount > 0) {
+            System.out.println("Opération supprimée avec succès !");
+        } else {
+            System.out.println("Aucune opération trouvée avec l'ID : " + machineId);
+        }
+    }
 }
 
    
