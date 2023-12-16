@@ -157,7 +157,7 @@ public class GestionBDD {
                     "create table machine (\n"
                     + "  id integer primary key auto_increment,\n"
                     + "  ref varchar(20),\n"
-                    + "  description text, \n"
+                    + "  des text, \n"
                     + "  puissance integer \n"
                     + ")\n"
             );
@@ -165,7 +165,7 @@ public class GestionBDD {
                     "create table produit (\n"
                     + "  id integer primary key auto_increment,\n"
                     + "  ref varchar(20),\n"
-                    + "  description text \n"
+                    + "  des text \n"
                     + ")"
             );
             st.executeUpdate(
@@ -178,7 +178,7 @@ public class GestionBDD {
             st.executeUpdate(
                     "create table typeoperation (\n"
                     + "  id integer primary key auto_increment,\n"
-                    + "  description text \n"
+                    + "  des text \n"
                     + ")"
             );
             st.executeUpdate(
@@ -205,11 +205,11 @@ public class GestionBDD {
             st.executeUpdate(
                     "alter table precede \n"
                     + "  add constraint fk_precede_opavant \n"
-                    + "  foreign key (opavant) references opération(id)");
+                    + "  foreign key (opavant) references operation(id)");
             st.executeUpdate(
                     "alter table precede \n"
                     + "  add constraint fk_precede_opapres \n"
-                    + "  foreign key (opavant) references opération(id)");
+                    + "  foreign key (opavant) references operation(id)");
             st.executeUpdate(
                     "alter table realise \n"
                     + "  add constraint fk_realise_idmachine \n"
@@ -218,10 +218,6 @@ public class GestionBDD {
                     "alter table realise \n"
                     + "  add constraint fk_realise_idtype \n"
                     + "  foreign key (idtype) references typeoperation(id)");
-            st.executeUpdate(
-                    "alter table realise \n"
-                    + "  add constraint fk_realise_idmachine \n"
-                    + "  foreign key (idmachine) references machine(id)");
             conn.commit();
         } catch (SQLException ex) {
             conn.rollback();
@@ -237,15 +233,35 @@ public class GestionBDD {
             // pour être sûr de pouvoir supprimer, il faut d'abord supprimer les liens
             // puis les tables
             // suppression des liens
-            /*try {
-                st.executeUpdate("alter table li_likes drop constraint fk_li_likes_u1");
+            try {
+                st.executeUpdate("alter table realise drop constraint fk_realise_idtype");
             } catch (SQLException ex) {
                 // nothing to do : maybe the constraint was not created
             }
-            /*try {
-                st.executeUpdate("alter table li_likes drop constraint fk_li_likes_u2");
+            try {
+                st.executeUpdate("alter table realise drop constraint fk_realise_idmachine");
             } catch (SQLException ex) {
-            }*/
+                // nothing to do : maybe the constraint was not created
+            }
+            try {
+                st.executeUpdate("alter table precede drop constraint fk_precede_opapres");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the constraint was not created
+            }
+            try {
+                st.executeUpdate("alter table precede drop constraint fk_precede_opavant");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the constraint was not created
+            }
+            try {
+                st.executeUpdate("alter table operation drop constraint fk_operation_idtype");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the constraint was not created
+            }
+            try {
+                st.executeUpdate("alter table operation drop constraint fk_operation_idproduit");
+            } catch (SQLException ex) {
+            }
             // je peux maintenant supprimer les tables
             try {
                 st.executeUpdate("drop table precede");
@@ -279,7 +295,7 @@ public class GestionBDD {
         try (Connection con = connectSurServeurM3()) {
             System.out.println("connecté");
             creeBase(con);
-            //createMachine(con,"F04","rapide",30);
+            createMachine(con,"F04","rapide",30);
             //deleteSchema(con);
         } catch (SQLException ex) {
             System.err.println("Code d'erreur SQL : " + ex.getErrorCode());
