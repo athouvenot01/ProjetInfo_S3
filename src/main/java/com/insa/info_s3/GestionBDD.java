@@ -194,7 +194,7 @@ public class GestionBDD {
                     + "  opapres integer \n"
                     + ")"
             );
-            /*st.executeUpdate(
+            st.executeUpdate(
                     "alter table operation \n"
                     + "  add constraint fk_operation_idproduit \n"
                     + "  foreign key (idproduit) references produit(id)");
@@ -221,7 +221,7 @@ public class GestionBDD {
             st.executeUpdate(
                     "alter table realise \n"
                     + "  add constraint fk_realise_idmachine \n"
-                    + "  foreign key (idmachine) references machine(id)");*/
+                    + "  foreign key (idmachine) references machine(id)");
             conn.commit();
         } catch (SQLException ex) {
             conn.rollback();
@@ -241,7 +241,7 @@ public class GestionBDD {
                 st.executeUpdate("alter table li_likes drop constraint fk_li_likes_u1");
             } catch (SQLException ex) {
                 // nothing to do : maybe the constraint was not created
-            }*/
+            }
             /*try {
                 st.executeUpdate("alter table li_likes drop constraint fk_li_likes_u2");
             } catch (SQLException ex) {
@@ -278,9 +278,9 @@ public class GestionBDD {
     public static void debut() {
         try (Connection con = connectSurServeurM3()) {
             System.out.println("connecté");
-            //creeBase(con);
+            creeBase(con);
             //createMachine(con,"F04","rapide",30);
-            deleteSchema(con);
+            //deleteSchema(con);
         } catch (SQLException ex) {
             System.err.println("Code d'erreur SQL : " + ex.getErrorCode());
             System.err.println("Message d'erreur SQL : " + ex.getMessage());
