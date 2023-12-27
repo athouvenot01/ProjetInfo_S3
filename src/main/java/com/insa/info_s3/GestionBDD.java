@@ -147,6 +147,33 @@ public class GestionBDD {
             }
         }
     }
+    
+    
+    //Ici c'est la création de machine
+    public static void createMateriaux(Connection con, String des, double prix) throws SQLException {
+        String sql = "INSERT INTO materiaux (des, prix) VALUES (?, ?)"; 
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setString(1, des);
+            preparedStatement.setDouble(2, prix);
+
+            preparedStatement.executeUpdate();
+            System.out.println("Matériaux créée avec succès !");
+        }
+    }
+    
+    //Ici suppresion d'une machine 
+    public static void deleteMateriaux(Connection con, int materiauxId) throws SQLException {
+        String sql = "DELETE FROM materiaux WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, materiauxId);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Matériaux supprimé avec succès !");
+            } else {
+                System.out.println("Aucun matériaux trouvée avec l'ID : " + materiauxId);
+            }
+        }
+    }
   
   
     public static void creeBase(Connection conn) throws SQLException {
@@ -165,7 +192,8 @@ public class GestionBDD {
                     "create table produit (\n"
                     + "  id integer primary key auto_increment,\n"
                     + "  ref varchar(20),\n"
-                    + "  des text \n"
+                    + "  des text, \n"
+                    + "  idmateriaux integer \n"
                     + ")"
             );
             st.executeUpdate(
@@ -183,7 +211,7 @@ public class GestionBDD {
             );
             st.executeUpdate(
                     "create table realise (\n"
-                    + "  idmachine integer primary key auto_increment,\n"
+                    + "  idmachine integer,\n"
                     + "  idtype integer, \n"
                     + "  duree integer \n"
                     + ")"
@@ -192,6 +220,13 @@ public class GestionBDD {
                     "create table precede (\n"
                     + "  opavant integer,\n"
                     + "  opapres integer \n"
+                    + ")"
+            );
+            st.executeUpdate(
+                    "create table materiaux (\n"
+                    + "  id integer primary key auto_increment,\n"
+                    + "  des text,\n"
+                    + "  prix real \n"
                     + ")"
             );
             st.executeUpdate(
@@ -218,6 +253,10 @@ public class GestionBDD {
                     "alter table realise \n"
                     + "  add constraint fk_realise_idtype \n"
                     + "  foreign key (idtype) references typeoperation(id)");
+            st.executeUpdate(
+                    "alter table produit \n"
+                    + "  add constraint fk_produit_idmateriaux \n"
+                    + "  foreign key (idmateriaux) references materiaux(id)");
             conn.commit();
         } catch (SQLException ex) {
             conn.rollback();
@@ -233,6 +272,11 @@ public class GestionBDD {
             // pour être sûr de pouvoir supprimer, il faut d'abord supprimer les liens
             // puis les tables
             // suppression des liens
+            try {
+                st.executeUpdate("alter table produit drop constraint fk_produit_idmateriaux");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the constraint was not created
+            }
             try {
                 st.executeUpdate("alter table realise drop constraint fk_realise_idtype");
             } catch (SQLException ex) {
@@ -263,6 +307,10 @@ public class GestionBDD {
             } catch (SQLException ex) {
             }
             // je peux maintenant supprimer les tables
+            try {
+                st.executeUpdate("drop table materiaux");
+            } catch (SQLException ex) {
+            }
             try {
                 st.executeUpdate("drop table precede");
             } catch (SQLException ex) {
