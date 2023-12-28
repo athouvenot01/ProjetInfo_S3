@@ -77,7 +77,7 @@ public class GestionBDD {
         }
     }
   
-    //méthode de création d'un nouveau produit 
+    //Ici création d'un produit 
     public static void createProduit(Connection con, String ref, String des, int idmateriaux) throws SQLException {
         String sql = "INSERT INTO produit (ref, des, idmateriaux) VALUES (?, ?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
@@ -97,15 +97,16 @@ public class GestionBDD {
             preparedStatement.setInt(1, produitID);
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
-                System.out.println("Produit supprimée avec succès !");
+                System.out.println("Produit supprimé avec succès !");
             } else {
-                System.out.println("Aucune Produit trouvée avec l'ID : " + produitID);
+                System.out.println("Aucun Produit trouvé avec l'ID : " + produitID);
             }
         }
     }
     
+    //Ici création d'une réalisation
     public static void createRealise(Connection con, long durée) throws SQLException {
-        String sql = "INSERT INTO produit (durée) VALUES (?)"; 
+        String sql = "INSERT INTO realise (durée) VALUES (?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setLong(1, durée);
 
@@ -114,46 +115,100 @@ public class GestionBDD {
         }
     }
     
-    //Ici suppresion d'un produit 
+    //Ici suppresion d'une réalisation 
     public static void deleteRealise(Connection con, int realiseID) throws SQLException {
-        String sql = "DELETE FROM produit WHERE id = ?";
+        String sql = "DELETE FROM realise WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, realiseID);
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
-                System.out.println("lien supprimée avec succès !");
+                System.out.println("lien supprimé avec succès !");
             } else {
-                System.out.println("Aucune lien trouvée avec l'ID : " + realiseID);
+                System.out.println("Aucun lien trouvé avec l'ID : " + realiseID);
             }
         }
     }
     
-    //ici Création d'une nouvelle opération
-    public static void createTypeOperation(Connection con, String des) throws SQLException {
-        String sql = "INSERT INTO produit (des) VALUES (?)"; 
+    //Ici création d'une opération
+    public static void createOperation(Connection con, int idtype, int idproduit) throws SQLException {
+        String sql = "INSERT INTO operation (idtype, idproduit) VALUES (?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-            preparedStatement.setString(2, des);
+            preparedStatement.setInt(1, idtype);
+            preparedStatement.setInt(2, idproduit);
+            
+            preparedStatement.executeUpdate();
+            System.out.println("Opération créée avec succès !");
+        }
+    }
+    
+    //Ici suppresion d'une opération 
+    public static void deleteOperation(Connection con, int operationID) throws SQLException {
+        String sql = "DELETE FROM operation WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, operationID);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Opération supprimée avec succès !");
+            } else {
+                System.out.println("Aucune opération trouvée avec l'ID : " + operationID);
+            }
+        }
+    }
+    
+    //Ici création d'une suite
+    public static void createPrecede(Connection con, int opavant, int opapres) throws SQLException {
+        String sql = "INSERT INTO precede (opavant, opapres) VALUES (?, ?)"; 
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setLong(1, opavant);
+            preparedStatement.setLong(2, opapres);
+
+
+            preparedStatement.executeUpdate();
+            System.out.println("Suite créée avec succès !");
+        }
+    }
+    
+    //Ici suppresion d'un lien 
+    public static void deletePrecede(Connection con, int precedeID) throws SQLException {
+        String sql = "DELETE FROM precede WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, precedeID);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Suite supprimée avec succès !");
+            } else {
+                System.out.println("Aucune suite trouvée avec l'ID : " + precedeID);
+            }
+        }
+    }
+    
+    //ici Création d'un nouveau type opération
+    public static void createTypeOperation(Connection con, String des) throws SQLException {
+        String sql = "INSERT INTO typeoperation (des) VALUES (?)"; 
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setString(1, des);
+            
             preparedStatement.executeUpdate();
             System.out.println("TypeOpération créée avec succès !");
         }
     }
     
-    //Ici suppresion d'une opération 
-    public static void deleteOperation(Connection con, int TypeoperationID) throws SQLException {
-        String sql = "DELETE FROM produit WHERE id = ?";
+    //Ici suppresion d'un type opération 
+    public static void deleteTypeOperation(Connection con, int TypeoperationID) throws SQLException {
+        String sql = "DELETE FROM typeoperation WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, TypeoperationID);
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
-                System.out.println("Le Type Opération supprimée avec succès !");
+                System.out.println("Type Opération supprimé avec succès !");
             } else {
-                System.out.println("Aucun type opération trouvée avec l'ID : " + TypeoperationID);
+                System.out.println("Aucun type opération trouvé avec l'ID : " + TypeoperationID);
             }
         }
     }
     
     
-    //Ici c'est la création de machine
+    //Ici c'est la création de materiaux
     public static void createMateriaux(Connection con, String des, double prix) throws SQLException {
         String sql = "INSERT INTO materiaux (des, prix) VALUES (?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
@@ -174,7 +229,7 @@ public class GestionBDD {
             if (rowCount > 0) {
                 System.out.println("Matériaux supprimé avec succès !");
             } else {
-                System.out.println("Aucun matériaux trouvée avec l'ID : " + materiauxId);
+                System.out.println("Aucun matériaux trouvé avec l'ID : " + materiauxId);
             }
         }
     }
