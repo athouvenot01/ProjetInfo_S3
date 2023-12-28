@@ -13,7 +13,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
-
+import java.util.List;
+import java.util.ArrayList;
+import java.sql.ResultSet;
 
 /**
  *
@@ -484,6 +486,40 @@ public class GestionBDD {
             }
         }
     }
+    public static Object[][] getTableValue(Connection connection, String tableName) throws SQLException {
+        List<List<Object>> resultMatrix = new ArrayList<>();
+
+        // Créer une requête SQL pour récupérer toutes les valeurs de la table
+        String sql = "SELECT * FROM " + tableName;
+
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            // Parcourir les résultats de la requête
+            while (resultSet.next()) {
+                List<Object> row = new ArrayList<>();
+                int columnCount = resultSet.getMetaData().getColumnCount();
+
+                // Récupérer les valeurs par colonne
+                for (int i = 1; i <= columnCount; i++) {
+                    row.add(resultSet.getObject(i));
+                }
+
+                // Ajouter la ligne à la matrice de résultats
+                resultMatrix.add(row);
+            }
+        }
+
+        // Convertir la liste de listes en tableau bidimensionnel
+        Object[][] resultArray = new Object[resultMatrix.size()][];
+        for (int i = 0; i < resultMatrix.size(); i++) {
+            List<Object> row = resultMatrix.get(i);
+            resultArray[i] = row.toArray(new Object[0]);
+        }
+
+        return resultArray;
+    }
+    
     
    
     public static void debut() {
