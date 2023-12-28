@@ -237,6 +237,33 @@ public class GestionBDD {
             }
         }
     }
+    
+    //Ici c'est la création d'un opérateur
+    public static void createOperateur(Connection con, String prenom, String nom, int idmachine) throws SQLException {
+        String sql = "INSERT INTO materiaux (prenom, nom, idmachine) VALUES (?, ?, ?)"; 
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setString(1, prenom);
+            preparedStatement.setString(2, nom);
+            preparedStatement.setInt(3, idmachine);
+
+            preparedStatement.executeUpdate();
+            System.out.println("Opérateur créée avec succès !");
+        }
+    }
+    
+    //Ici suppresion d'un opérateur 
+    public static void deleteOpérateur(Connection con, int operateurId) throws SQLException {
+        String sql = "DELETE FROM materiaux WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, operateurId);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Opérateur supprimé avec succès !");
+            } else {
+                System.out.println("Aucun opérateur trouvé avec l'ID : " + operateurId);
+            }
+        }
+    }
   
   
     public static void creeBase(Connection conn) throws SQLException {
@@ -293,6 +320,14 @@ public class GestionBDD {
                     + ")"
             );
             st.executeUpdate(
+                    "create table operateur (\n"
+                    + "  id integer primary key auto_increment,\n"
+                    + "  prenom text,\n"
+                    + "  nom text,\n"
+                    + "  idmachine integer \n"
+                    + ")"
+            );
+            st.executeUpdate(
                     "alter table operation \n"
                     + "  add constraint fk_operation_idproduit \n"
                     + "  foreign key (idproduit) references produit(id)");
@@ -320,6 +355,10 @@ public class GestionBDD {
                     "alter table produit \n"
                     + "  add constraint fk_produit_idmateriaux \n"
                     + "  foreign key (idmateriaux) references materiaux(id)");
+            st.executeUpdate(
+                    "alter table operateur \n"
+                    + "  add constraint fk_operateur_idmachine \n"
+                    + "  foreign key (idmachine) references machine(id)");
             conn.commit();
         } catch (SQLException ex) {
             conn.rollback();
@@ -335,6 +374,11 @@ public class GestionBDD {
             // pour être sûr de pouvoir supprimer, il faut d'abord supprimer les liens
             // puis les tables
             // suppression des liens
+            try {
+                st.executeUpdate("alter table operateur drop constraint fk_operateur_idmachine");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the constraint was not created
+            }
             try {
                 st.executeUpdate("alter table produit drop constraint fk_produit_idmateriaux");
             } catch (SQLException ex) {
@@ -370,6 +414,10 @@ public class GestionBDD {
             } catch (SQLException ex) {
             }
             // je peux maintenant supprimer les tables
+            try {
+                st.executeUpdate("drop table operateur");
+            } catch (SQLException ex) {
+            }
             try {
                 st.executeUpdate("drop table materiaux");
             } catch (SQLException ex) {
@@ -483,9 +531,22 @@ public class GestionBDD {
                         System.out.println("Erreur lors de la création du materiaux");
                     }
                 } 
+                if (bouts[0].equals("operateur")) { 
+                    String prenom = bouts[1];
+                    String nom = bouts[2];
+                    int idmachine = Integer.parseInt(bouts[3]);
+                    
+                    try {
+                        createOperateur(con, prenom, nom, idmachine);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création de l'operateur");
+                    }
+                } 
             }
         }
     }
+    
+    
     public static Object[][] getTableValue(Connection connection, String tableName) throws SQLException {
         List<List<Object>> resultMatrix = new ArrayList<>();
 
@@ -525,8 +586,8 @@ public class GestionBDD {
     public static void debut() {
         try (Connection con = connectSurServeurM3()) {
             System.out.println("connecté");
-            creeBase(con);
-            createMachine(con,"F04","rapide",30);
+            //creeBase(con);
+            //createMachine(con,"F04","rapide",30);
             //deleteSchema(con);
         } catch (SQLException ex) {
             System.err.println("Code d'erreur SQL : " + ex.getErrorCode());
