@@ -105,10 +105,12 @@ public class GestionBDD {
     }
     
     //Ici création d'une réalisation
-    public static void createRealise(Connection con, long durée) throws SQLException {
-        String sql = "INSERT INTO realise (durée) VALUES (?)"; 
+    public static void createRealise(Connection con, int idmachine, int idtype, long durée) throws SQLException {
+        String sql = "INSERT INTO realise (idmachine, idtype, durée) VALUES (?, ?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-            preparedStatement.setLong(1, durée);
+            preparedStatement.setInt(1, idmachine);
+            preparedStatement.setInt(2, idtype);
+            preparedStatement.setLong(3, durée);
 
             preparedStatement.executeUpdate();
             System.out.println("Lien créée avec succès !");
@@ -430,17 +432,45 @@ public class GestionBDD {
                     }
                 }  
                 if (bouts[0].equals("realise")) { 
-                    long duree = Long.parseLong(bouts[1]);
+                    int idmachine = Integer.parseInt(bouts[1]);
+                    int idtype = Integer.parseInt(bouts[2]);
+                    long duree = Long.parseLong(bouts[3]);
                     
                     try {
-                        createRealise(con, duree);
+                        createRealise(con, idmachine, idtype, duree);
                     } catch (SQLException e) {
                         System.out.println("Erreur lors de la création de réalise");
                     }
                 }  
-                
-                // manque opération, typeoperation et precede
-                
+                if (bouts[0].equals("operation")) { 
+                    int idtype = Integer.parseInt(bouts[1]);
+                    int idproduit = Integer.parseInt(bouts[2]);
+                    
+                    try {
+                        createOperation(con, idtype, idproduit);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création de l'opération");
+                    }
+                } 
+                if (bouts[0].equals("precede")) { 
+                    int opavant = Integer.parseInt(bouts[1]);
+                    int opapres = Integer.parseInt(bouts[2]);
+                    
+                    try {
+                        createPrecede(con, opavant, opapres);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création de la suite");
+                    }
+                }
+                if (bouts[0].equals("typeoperation")) { 
+                    String des = bouts[1];
+                    
+                    try {
+                        createTypeOperation(con, des);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création du type opération");
+                    }
+                }
                 if (bouts[0].equals("materiaux")) { 
                     String des = bouts[1];
                     double prix = Double.parseDouble(bouts[2]);
