@@ -343,11 +343,11 @@ public class GestionBDD {
     }
     
     
-    public void lecture(File fin) throws IOException, SQLException {
+    public static void lecture(File fin) throws IOException, SQLException {
         Connection con = connectSurServeurM3();
         if (con == null) {
             throw new SQLException("Connexion à la base de données échouée");
-        }     
+        }       
         try (BufferedReader bin = new BufferedReader(new FileReader(fin))) {
             String line; 
             while ((line = bin.readLine()) != null && line.length() != 0) {
@@ -363,6 +363,39 @@ public class GestionBDD {
                         System.out.println("Erreur lors de la création de la machine");
                     }
                 }  
+                if (bouts[0].equals("produit")) { 
+                    String ref = bouts[1];
+                    String des = bouts[2];
+                    int idmateriaux = Integer.parseInt(bouts[3]);
+                    
+                    try {
+                        createProduit(con, ref, des, idmateriaux);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création du produit");
+                    }
+                }  
+                if (bouts[0].equals("realise")) { 
+                    long duree = Long.parseLong(bouts[1]);
+                    
+                    try {
+                        createRealise(con, duree);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création de réalise");
+                    }
+                }  
+                
+                // manque opération, typeoperation et precede
+                
+                if (bouts[0].equals("materiaux")) { 
+                    String des = bouts[1];
+                    double prix = Double.parseDouble(bouts[2]);
+                    
+                    try {
+                        createMateriaux(con, des, prix);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création du materiaux");
+                    }
+                } 
             }
         }
     }
