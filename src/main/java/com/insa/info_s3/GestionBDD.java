@@ -4,12 +4,15 @@
  */
 package com.insa.info_s3;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 
 /**
@@ -75,12 +78,13 @@ public class GestionBDD {
     }
   
     //méthode de création d'un nouveau produit 
-    public static void createProduit(Connection con, String ref, String des) throws SQLException {
-        String sql = "INSERT INTO produit (ref, des) VALUES (?, ?)"; 
+    public static void createProduit(Connection con, String ref, String des, int idmateriaux) throws SQLException {
+        String sql = "INSERT INTO produit (ref, des, idmateriaux) VALUES (?, ?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setString(1, ref);
             preparedStatement.setString(2, des);
-
+            preparedStatement.setInt(3, idmateriaux);
+            
             preparedStatement.executeUpdate();
             System.out.println("Produit créée avec succès !");
         }
@@ -334,6 +338,31 @@ public class GestionBDD {
             try {
                 st.executeUpdate("drop table machine");
             } catch (SQLException ex) {
+            }
+        }
+    }
+    
+    
+    public void lecture(File fin) throws IOException, SQLException {
+        Connection con = connectSurServeurM3();
+        if (con == null) {
+            throw new SQLException("Connexion à la base de données échouée");
+        }     
+        try (BufferedReader bin = new BufferedReader(new FileReader(fin))) {
+            String line; 
+            while ((line = bin.readLine()) != null && line.length() != 0) {
+                String[] bouts = line.split(";");
+                if (bouts[0].equals("machine")) { 
+                    String ref = bouts[1];
+                    String des = bouts[2];
+                    int puissance = Integer.parseInt(bouts[3]);
+                    
+                    try {
+                        createMachine(con, ref, des, puissance);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création de la machine");
+                    }
+                }  
             }
         }
     }
