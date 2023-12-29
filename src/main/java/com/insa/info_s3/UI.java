@@ -4,6 +4,7 @@
  */
 package com.insa.info_s3;
 
+import static com.insa.info_s3.GestionBDD.getTableValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -13,6 +14,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.router.Route;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  *
@@ -21,68 +25,79 @@ import com.vaadin.flow.router.Route;
 @Route
 public class UI extends VerticalLayout {
     
-     public UI() {
+    public UI() {
+        try (Connection con = GestionBDD.connectSurServeurM3()){
+            H1 title = new H1 ("Base de donnée");
+            Button produit = new Button ("produit");
+            Button machine = new Button ("machine"); 
+            Button realise = new Button ("réalise ");
+            Button typeoperation = new Button ("type d'opération");
         
-        H1 title = new H1 ("Base de donnée");
-        Button produit = new Button ("produit");
-        Button machine = new Button ("machine"); 
-        Button realise = new Button ("réalise ");
-        Button typeoperation = new Button ("type d'opération");
-        
-        produit.addClickListener(click ->{
-            Grid<String> liste_produit = new Grid<>();
-            liste_produit.setHeight("auto");
-            liste_produit = getTableValue(conn, "produit");
-            add(liste_produit);
-        });
+            produit.addClickListener(click ->{
+                // Créez un composant Grid
+                Grid<Object> liste_produit = new Grid<>(Object.class);
+                
+                // Ajoutez les colonnes au Grid
+                liste_produit.setColumns();
+                
+                // Ajoutez les lignes au Grid
+                liste_produit.setItems();
+                
+                // Ajoutez le Grid à la mise en page
+                add(liste_produit);
+            });
        
-         machine.addClickListener(click ->{
-            Grid<String> liste_machine = new Grid<>();
-            liste_machine.setHeight("auto");
-            liste_machine = getTableValue(conn, "produit");
-            add(liste_machine);
-            
-        });
+            machine.addClickListener(click ->{
+                // Créez un composant Grid
+                Grid<Object> liste_machine = new Grid<>(Object.class);
+                
+                // Ajoutez les colonnes au Grid
+                liste_machine.setColumns();
+                
+                // Ajoutez les lignes au Grid
+                liste_machine.setItems();
+                
+                // Ajoutez le Grid à la mise en page
+                add(liste_machine);
+            });
          
-          realise.addClickListener(click ->{
-            Grid<String> liste_realise = new Grid<>();
-            liste_realise.setHeight("auto");
-            liste_realise = getTableValue(conn, "produit");
-            add(liste_realise);
-        });
+            realise.addClickListener(click ->{
+               // Créez un composant Grid
+                Grid<Object> liste_realise = new Grid<>(Object.class);
+                
+                // Ajoutez les colonnes au Grid
+                liste_realise.setColumns();
+                
+                // Ajoutez les lignes au Grid
+                liste_realise.setItems();
+                
+                // Ajoutez le Grid à la mise en page
+                add(liste_realise);
+            });
           
-           typeoperation.addClickListener(click ->{
-            Grid<String> liste_typeoperation = new Grid<>();
-            liste_typeoperation.setHeight("auto");
-            liste_typeoperation = getTableValue(conn, "produit");
-            add(liste_typeoperation);
-        });
+            typeoperation.addClickListener(click ->{
+                // Créez un composant Grid
+                Grid<Object> liste_typeoperation = new Grid<>(Object.class);
+                
+                // Ajoutez les colonnes au Grid
+                liste_typeoperation.setColumns();
+                
+                // Ajoutez les lignes au Grid
+                liste_typeoperation.setItems();
+                
+                // Ajoutez le Grid à la mise en page
+                add(liste_typeoperation);
+            });
         
            
-        add(
-            new HorizontalLayout(title), 
-            new VerticalLayout(produit, machine, realise, typeoperation));
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         /*H1 titre = new H1 ("liste de tâches à faire");
-        VerticalLayout todolist = new VerticalLayout() ;
-        TextArea taches = new TextArea();
-        Button bouton_ajout = new Button("ajouter la tâches à faire");
-        bouton_ajout.addClickListener( click -> {
-            Checkbox verification = new Checkbox (taches.getValue());
-            todolist.add(verification);
-        });
-        bouton_ajout.addClickShortcut(Key.ENTER);
-        
-        add(titre, todolist, new HorizontalLayout(taches, bouton_ajout));
-        */
+            add(
+                new HorizontalLayout(title), 
+                new VerticalLayout(produit, machine, realise, typeoperation));
+            
+        }
+        catch (SQLException ex) {
+            System.out.println("probleme : " + ex.getLocalizedMessage());
+            ex.printStackTrace();
+        }
     }          
-    
 }
