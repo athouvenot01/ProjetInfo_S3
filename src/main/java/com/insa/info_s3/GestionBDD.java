@@ -240,7 +240,7 @@ public class GestionBDD {
     
     //Ici c'est la création d'un opérateur
     public static void createOperateur(Connection con, String prenom, String nom, int idmachine) throws SQLException {
-        String sql = "INSERT INTO materiaux (prenom, nom, idmachine) VALUES (?, ?, ?)"; 
+        String sql = "INSERT INTO operateur (prenom, nom, idmachine) VALUES (?, ?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setString(1, prenom);
             preparedStatement.setString(2, nom);
@@ -252,8 +252,8 @@ public class GestionBDD {
     }
     
     //Ici suppresion d'un opérateur 
-    public static void deleteOpérateur(Connection con, int operateurId) throws SQLException {
-        String sql = "DELETE FROM materiaux WHERE id = ?";
+    public static void deleteOperateur(Connection con, int operateurId) throws SQLException {
+        String sql = "DELETE FROM operateur WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, operateurId);
             int rowCount = preparedStatement.executeUpdate();
