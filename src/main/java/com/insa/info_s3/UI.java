@@ -9,7 +9,9 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -22,12 +24,14 @@ import java.sql.SQLException;
  *
  * @author loicrosian
  */
-@Route
-public class UI extends VerticalLayout {
+
+@Route(value = "UI", layout = accueil_View.class)
+public class UI extends Div {
     
     public UI() {
+        //contenu de la page de l'interface utilisateur
         try (Connection con = GestionBDD.connectSurServeurM3()){
-            H1 title = new H1 ("Base de donnée");
+            H2 title = new H2 ("Binvenue dans l'interface utilisateur");
             Button produit = new Button ("produit");
             Button machine = new Button ("machine"); 
             Button realise = new Button ("réalise ");
@@ -91,7 +95,7 @@ public class UI extends VerticalLayout {
         
            
             add(
-                new HorizontalLayout(title), 
+                title, 
                 new VerticalLayout(produit, machine, realise, typeoperation));
             
         }
