@@ -16,6 +16,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.router.RouterLink;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -25,13 +27,13 @@ import java.sql.SQLException;
  * @author loicrosian
  */
 
-@Route(value = "UI", layout = accueil_View.class)
-public class UI extends Div {
+@Route("")
+public class UI extends VerticalLayout implements RouterLayout{
     
     public UI() {
         //contenu de la page de l'interface utilisateur
         try (Connection con = GestionBDD.connectSurServeurM3()){
-            H2 title = new H2 ("Binvenue dans l'interface utilisateur");
+            H2 title = new H2 ("Binvenue dans la base donnée");
             Button produit = new Button ("produit");
             Button machine = new Button ("machine"); 
             Button realise = new Button ("réalise ");
@@ -96,7 +98,9 @@ public class UI extends Div {
            
             add(
                 title, 
-                new VerticalLayout(produit, machine, realise, typeoperation));
+                new VerticalLayout(produit, machine, realise, typeoperation),
+                new RouterLink("Table produit", produit_View.class)
+                        );
             
         }
         catch (SQLException ex) {
