@@ -18,5 +18,9 @@ import static com.insa.info_s3.GestionBDD.getTableValue;
 public class produit_View extends Div {
     
    Grid <String[]> liste_produit = new Grid<>();
+   liste_produit = getTableValue(con, "produit");
+   
+   add(liste_produit);
   
+   
 }
