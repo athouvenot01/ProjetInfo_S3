@@ -8,10 +8,13 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.Route;
 import static com.insa.info_s3.GestionBDD.getTableValue;
+import com.vaadin.flow.component.button.Button;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -37,8 +40,23 @@ public class produit_View extends Div {
                 add(liste_produit);
             */
             
-            Object[][] liste_produit = getTableValue(con, produit);
+            /*Object[][] liste_produit = getTableValue(con, produit);
             add(liste_produit);
+            */
+            
+            List<String> chaines = Arrays.asList(
+                "Chaine 1",
+                "Chaine 2",
+                "Chaine 3"
+            );
+            Grid<String> grid = new Grid<>();
+            grid.setItems(chaines);
+            
+            grid.addColumn(String::toString).setHeader("Colonne de Chaînes");
+
+            add(grid);
+            
+            
             
         } catch (SQLException ex) {
             System.out.println("probleme : " + ex.getLocalizedMessage());

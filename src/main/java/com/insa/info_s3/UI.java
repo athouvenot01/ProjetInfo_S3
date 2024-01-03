@@ -21,6 +21,8 @@ import com.vaadin.flow.router.RouterLink;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -40,17 +42,17 @@ public class UI extends VerticalLayout implements RouterLayout{
             Button typeoperation = new Button ("type d'opération");
         
             produit.addClickListener(click ->{
-                // Créez un composant Grid
-                Grid<Object> liste_produit = new Grid<>(Object.class);
-                
-                // Ajoutez les colonnes au Grid
-                liste_produit.setColumns();
-                
-                // Ajoutez les lignes au Grid
-                liste_produit.setItems();
-                
-                // Ajoutez le Grid à la mise en page
-                add(liste_produit);
+                List<String> chaines = Arrays.asList(
+                "Chaine 1",
+                "Chaine 2",
+                "Chaine 3"
+            );
+            Grid<String> grid = new Grid<>();
+            grid.setItems(chaines);
+            
+            grid.addColumn(String::toString).setHeader("Colonne de Chaînes");
+
+            add(grid);
             });
        
             machine.addClickListener(click ->{
