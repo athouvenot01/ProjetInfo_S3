@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 
 public class Interface_Console {
-    
+    /*
     public static void main(String[] args) {
         InterfaceC();  
     }
@@ -68,5 +68,5 @@ public class Interface_Console {
             System.out.println("probleme : " + ex.getLocalizedMessage());
             ex.printStackTrace();
         }
-    }
+    }*/
 }

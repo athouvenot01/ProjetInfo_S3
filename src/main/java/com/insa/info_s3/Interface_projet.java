@@ -24,7 +24,7 @@ public class Interface_projet implements AppShellConfigurator {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        SpringApplication.run(UI.class, args);
+        SpringApplication.run(Interface_projet.class, args);
     }
     
 }

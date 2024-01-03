@@ -99,7 +99,8 @@ public class UI extends VerticalLayout implements RouterLayout{
             add(
                 title, 
                 new VerticalLayout(produit, machine, realise, typeoperation),
-                new RouterLink("Table produit", produit_View.class)
+                new RouterLink("Table produit", produit_View.class),
+                new RouterLink("Table machine", machine_View.class)
                         );
             
         }
