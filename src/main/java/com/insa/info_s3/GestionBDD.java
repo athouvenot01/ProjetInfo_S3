@@ -450,8 +450,7 @@ public class GestionBDD {
     }
     
     
-    public static void lecture(File fin) throws IOException, SQLException {
-        Connection con = connectSurServeurM3();
+    public static void lecture(Connection con, File fin) throws IOException, SQLException {
         if (con == null) {
             throw new SQLException("Connexion à la base de données échouée");
         }       
@@ -583,12 +582,13 @@ public class GestionBDD {
     
     
    
-    public static void debut() {
+    public static void debut() throws IOException {
         try (Connection con = connectSurServeurM3()) {
             System.out.println("connecté");
-            //creeBase(con);
+            deleteSchema(con);
+            creeBase(con);
             //createMachine(con,"F04","rapide",30);
-            //deleteSchema(con);
+            lecture(con, new File("lecture.txt"));
         } catch (SQLException ex) {
             System.err.println("Code d'erreur SQL : " + ex.getErrorCode());
             System.err.println("Message d'erreur SQL : " + ex.getMessage());
@@ -597,7 +597,7 @@ public class GestionBDD {
     }
     
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         debut();
         
     }
