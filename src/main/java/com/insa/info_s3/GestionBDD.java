@@ -107,12 +107,12 @@ public class GestionBDD {
     }
     
     //Ici création d'une réalisation
-    public static void createRealise(Connection con, int idmachine, int idtype, long durée) throws SQLException {
-        String sql = "INSERT INTO realise (idmachine, idtype, durée) VALUES (?, ?, ?)"; 
+    public static void createRealise(Connection con, int idmachine, int idtype, long duree) throws SQLException {
+        String sql = "INSERT INTO realise (idmachine, idtype, duree) VALUES (?, ?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, idmachine);
             preparedStatement.setInt(2, idtype);
-            preparedStatement.setLong(3, durée);
+            preparedStatement.setLong(3, duree);
 
             preparedStatement.executeUpdate();
             System.out.println("Lien créée avec succès !");
