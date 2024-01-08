@@ -79,7 +79,25 @@ public class GestionBDD {
             }
         }
     }
-  
+    //Permet de changer l'etat machine 
+    public static void EtatMachine (Connection con, int Etat, int id)throws SQLException{
+        String sql ="UPDATE machine SET etatmachine = ? WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)){
+                preparedStatement.setInt(1,Etat);
+                preparedStatement.setInt(2,id);
+                 preparedStatement.executeUpdate();
+        }
+    }
+    //Permet de changer l'etat opérateur 
+    public static void EtatOperateur (Connection con, int Etat, int id)throws SQLException{
+        String sql ="UPDATE operateur SET Etat =?  WHERE id = ? ";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)){
+           preparedStatement.setInt(1,Etat);
+           preparedStatement.setInt(2,id);
+           preparedStatement.executeUpdate();     
+        }
+    }
+    
     //Ici création d'un produit 
     public static void createProduit(Connection con, String ref, String des, int idmateriaux) throws SQLException {
         String sql = "INSERT INTO produit (ref, des, idmateriaux) VALUES (?, ?, ?)"; 
