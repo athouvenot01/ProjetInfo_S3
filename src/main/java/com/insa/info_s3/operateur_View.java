@@ -32,7 +32,7 @@ import java.util.List;
 
 @Route(value = "operateur_View", layout = UI.class)
 public class operateur_View extends Div {
-    
+
     public operateur_View() throws SQLException{
        
         try (Connection con = GestionBDD.connectSurServeurM3()){
@@ -72,16 +72,19 @@ public class operateur_View extends Div {
                 TextField nom = new TextField("entrez le nom de l'opérateur à ajouter");
                 TextField prenom = new TextField("entrez le prénom de l'opérateur à ajouter");
                 TextField machine = new TextField("entrez l'id de la machine liée à l'opérateur");
+                TextField etatoperateur = new TextField("entrez l'état de l'opérateur");
                 Button entrer = new Button("valider");
              
                 entrer.addClickListener(enter -> {
                     String valeur_nom = nom.getValue();
                     String valeur_prenom = prenom.getValue();
                     String valeur_machine = machine.getValue();
+                    String valeur_etatoperateur = etatoperateur.getValue();
                     try {
                         // Convertir la valeur en int
                         int id_machine = Integer.parseInt(valeur_machine);
-                        createOperateur(con, valeur_prenom, valeur_nom, id_machine);
+                        int etat_operateur = Integer.parseInt(valeur_etatoperateur);
+                        createOperateur(con, valeur_prenom, valeur_nom, id_machine,etat_operateur);
                     } catch (NumberFormatException ex) {
                         afficherNotification("Veuillez saisir un entier valide");
                     }catch (SQLException ex) {
