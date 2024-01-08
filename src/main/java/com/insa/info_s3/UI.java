@@ -29,7 +29,7 @@ import java.util.List;
  * @author loicrosian
  */
 
-@Route("")
+@Route(value = "")
 public class UI extends VerticalLayout implements RouterLayout{
     
     public UI() {
