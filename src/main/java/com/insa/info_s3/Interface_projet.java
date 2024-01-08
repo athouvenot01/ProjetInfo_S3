@@ -7,8 +7,12 @@ package com.insa.info_s3;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
+import jakarta.annotation.PostConstruct;
+import java.awt.Desktop;
+import java.net.URI;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
  *
@@ -17,8 +21,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @PWA(name = "Gestion Base de donnée", shortName = "Gestion BDD")
-@Theme("Lumo")
-public class Interface_projet implements AppShellConfigurator {
+@Theme(value = "Lumo")
+public class Interface_projet
+        extends SpringBootServletInitializer 
+        implements AppShellConfigurator {
 
     /**
      * @param args the command line arguments
@@ -26,5 +32,6 @@ public class Interface_projet implements AppShellConfigurator {
     public static void main(String[] args) {
         SpringApplication.run(Interface_projet.class, args);
     }
+    
     
 }
