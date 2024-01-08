@@ -53,16 +53,17 @@ public class GestionBDD {
   
     //Création des méthodes liées à la Table Machine 
     //Ici c'est la création de machine en fonction des différentes colonnes de la table
-    public static void createMachine(Connection con, String ref, String des, int puissance) throws SQLException {
-        String sql = "INSERT INTO machine (ref, des, puissance) VALUES (?, ?, ?)"; 
+    public static void createMachine(Connection con, String ref, String des, int puissance, boolean etatmachine) throws SQLException {
+        String sql = "INSERT INTO machine (ref, des, puissance, etatmachine) VALUES (?, ?, ?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setString(1, ref);
             preparedStatement.setString(2, des);
             preparedStatement.setInt(3, puissance);
+            preparedStatement.setBoolean(4, etatmachine);
 
             preparedStatement.executeUpdate();
             System.out.println("Machine créée avec succès !");
-        }
+        }   
     }
     
     //Ici suppresion d'une machine 
@@ -239,12 +240,13 @@ public class GestionBDD {
     }
     
     //Ici c'est la création d'un opérateur
-    public static void createOperateur(Connection con, String prenom, String nom, int idmachine) throws SQLException {
-        String sql = "INSERT INTO operateur (prenom, nom, idmachine) VALUES (?, ?, ?)"; 
+    public static void createOperateur(Connection con, String prenom, String nom, int idmachine, boolean etatoperateur) throws SQLException {
+        String sql = "INSERT INTO operateur (prenom, nom, idmachine, etatoperateur) VALUES (?, ?, ?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setString(1, prenom);
             preparedStatement.setString(2, nom);
             preparedStatement.setInt(3, idmachine);
+            preparedStatement.setBoolean(4, etatoperateur);
 
             preparedStatement.executeUpdate();
             System.out.println("Opérateur créée avec succès !");
@@ -275,7 +277,8 @@ public class GestionBDD {
                     + "  id integer primary key auto_increment,\n"
                     + "  ref varchar(20),\n"
                     + "  des text, \n"
-                    + "  puissance integer \n"
+                    + "  puissance integer, \n"
+                    + "  etatmachine boolean \n"
                     + ")\n"
             );
             st.executeUpdate(
@@ -324,7 +327,8 @@ public class GestionBDD {
                     + "  id integer primary key auto_increment,\n"
                     + "  prenom text,\n"
                     + "  nom text,\n"
-                    + "  idmachine integer \n"
+                    + "  idmachine integer, \n"
+                    + "  etatoperateur boolean \n"
                     + ")"
             );
             st.executeUpdate(
@@ -462,9 +466,10 @@ public class GestionBDD {
                     String ref = bouts[1];
                     String des = bouts[2];
                     int puissance = Integer.parseInt(bouts[3]);
+                    boolean etatmachine = Boolean.parseBoolean(bouts[4]);
                     
                     try {
-                        createMachine(con, ref, des, puissance);
+                        createMachine(con, ref, des, puissance, etatmachine);
                     } catch (SQLException e) {
                         System.out.println("Erreur lors de la création de la machine");
                     }
@@ -534,9 +539,10 @@ public class GestionBDD {
                     String prenom = bouts[1];
                     String nom = bouts[2];
                     int idmachine = Integer.parseInt(bouts[3]);
+                    boolean etatoperateur = Boolean.parseBoolean(bouts[4]);
                     
                     try {
-                        createOperateur(con, prenom, nom, idmachine);
+                        createOperateur(con, prenom, nom, idmachine, etatoperateur);
                     } catch (SQLException e) {
                         System.out.println("Erreur lors de la création de l'operateur");
                     }
