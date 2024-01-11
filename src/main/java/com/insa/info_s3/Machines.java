@@ -23,6 +23,20 @@ public class Machines {
             this.puissance = puissance;
             this.etatmachine =etatmachine;
         }
+        public String getDes() {
+            return des;
+        }
+
+        public void setDes(String des) {
+            this.des = des;
+        }
+         public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
 
         public String getRef() {
             return ref;
@@ -32,13 +46,7 @@ public class Machines {
             this.ref = ref;
         }
 
-        public String getDes() {
-            return des;
-        }
-
-        public void setDes(String des) {
-            this.des = des;
-        }
+        
 
         public int getPuissance() {
             return puissance;
@@ -48,13 +56,7 @@ public class Machines {
             this.puissance = puissance;
         }
 
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
+       
 
         public int getEtatmachine() {
             return etatmachine;

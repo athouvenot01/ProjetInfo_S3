@@ -5,6 +5,7 @@
 package com.insa.info_s3;
 
 import static com.insa.info_s3.GestionBDD.deleteProduit;
+import com.insa.info_s3.Machines.Machine;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -96,20 +97,19 @@ public class machine_View extends Div {
             );
 
             // Créer une grille avec les colonnes
-            Grid<List<String>> grid = new Grid<>();
-            grid.setItems(donnees);
-
-            // Ajouter des colonnes à la grille
-            for (int i = 0; i < donnees.get(0).size(); i++) {
-                int indiceColonne = i;
-                grid.addColumn(item -> item.get(indiceColonne)).setHeader("Colonne " + (indiceColonne + 1));
-            }
-
+            List<Machine> Machines = GestionBDD.Getmachine(con);
+            Grid<Machine> grid = new Grid<>();
+            grid.addColumn(Machine::getId).setHeader("Id");
+            grid.addColumn(Machine::getRef).setHeader("ref");
+            grid.addColumn(Machine::getDes).setHeader("des");
+            grid.addColumn(Machine::getPuissance).setHeader("Puissance");
+            grid.addColumn(Machine::getEtatmachine).setHeader("Etat Machine");
             
-            
+            grid.setItems(Machines);
+           
             add(
                 titre_View, 
-                new VerticalLayout(grid),
+                grid,
                 new HorizontalLayout(B1, B2, actualiser) 
                 );
             
