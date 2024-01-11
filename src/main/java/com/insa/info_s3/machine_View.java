@@ -89,13 +89,6 @@ public class machine_View extends Div {
                 dialog.open();
             });
             
-            // Données pour la grille (liste de listes)
-            List<List<String>> donnees = Arrays.asList(
-                Arrays.asList("A1", "B1", "C1"),
-                Arrays.asList("A2", "B2", "C2"),
-                Arrays.asList("A3", "B3", "C3")
-            );
-
             // Créer une grille avec les colonnes
             List<Machine> Machines = GestionBDD.Getmachine(con);
             Grid<Machine> grid = new Grid<>();
