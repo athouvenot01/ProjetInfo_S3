@@ -9,10 +9,14 @@ import static com.insa.info_s3.GestionBDD.createProduit;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -37,8 +41,10 @@ public class operateur_View extends Div {
        
         try (Connection con = GestionBDD.connectSurServeurM3()){
             H2 titre_View = new H2("Registre des opérateurs");
-            Button B1 = new Button ("voulez-vous supprimer un opérateur de la liste ?");
-            Button B2 = new Button ("voulez-vous ajouter un opérateur à la liste ?");
+            Button B1 = new Button ("Supprimer un opérateur",VaadinIcon.TRASH.create());
+            Button B2 = new Button ("Ajouter un opérateur",VaadinIcon.PLUS.create());
+            B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
+            B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             
             Button actualiser = new Button("Actualiser"); 
             actualiser.addClickListener(e -> {
@@ -69,6 +75,23 @@ public class operateur_View extends Div {
             });
             
             B2.addClickListener(click -> {
+                
+                Dialog dialog = new Dialog();
+
+                dialog.setHeaderTitle("Nouvel opérateur");
+
+                VerticalLayout dialogLayout = createDialogLayout();
+                dialog.add(dialogLayout);
+
+                Button saveButton = createSaveButton(dialog);
+                Button cancelButton = new Button("Cancel", e -> dialog.close());
+                dialog.getFooter().add(cancelButton);
+                dialog.getFooter().add(saveButton);
+
+
+                dialog.open();
+                
+                /*
                 TextField nom = new TextField("entrez le nom de l'opérateur à ajouter");
                 TextField prenom = new TextField("entrez le prénom de l'opérateur à ajouter");
                 TextField machine = new TextField("entrez l'id de la machine liée à l'opérateur");
@@ -89,14 +112,14 @@ public class operateur_View extends Div {
                         afficherNotification("Veuillez saisir un entier valide");
                     }catch (SQLException ex) {
                         Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    
                 });
                         
                 add(
                     nom, 
                     prenom, 
                     machine,
-                    entrer);
+                    entrer);*/
             });
             
             // Données pour la grille (liste de listes)
@@ -134,5 +157,29 @@ public class operateur_View extends Div {
 
         // Afficher la notification
         notification.open();
+    }
+    
+    private static VerticalLayout createDialogLayout() {
+
+        TextField id = new TextField("Prénom ");
+        TextField des = new TextField("Nom ");
+        TextField puissance = new TextField("id de la machine");
+        TextField etat_machine = new TextField("état de l'opérateur");
+
+        VerticalLayout dialogLayout = new VerticalLayout(id,
+                des,puissance, etat_machine);
+        dialogLayout.setPadding(false);
+        dialogLayout.setSpacing(false);
+        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+
+        return dialogLayout;
+    }
+    
+    private static Button createSaveButton(Dialog dialog) {
+        Button saveButton = new Button("Add", e -> dialog.close());
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        return saveButton;
     }
 }
