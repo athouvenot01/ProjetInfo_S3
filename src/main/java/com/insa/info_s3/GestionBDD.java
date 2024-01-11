@@ -4,6 +4,7 @@
  */
 package com.insa.info_s3;
 
+import com.insa.info_s3.Machines.Machine;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -50,6 +51,31 @@ public class GestionBDD {
                 "30ea71e6");
     }
     
+  public static List<Machine> Getmachine (Connection con )throws SQLException{
+  List<Machine> Machines  = new ArrayList <>();
+  String sql = "SELECT * FROM machine";
+  try  (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+    try (ResultSet resultSet = preparedStatement.executeQuery()) {
+      while (resultSet.next()) {
+                        int id = resultSet.getInt("id");
+                        String ref = resultSet.getString("ref");
+                        String des = resultSet.getString("des");
+                        int puissance = resultSet.getInt("puissance");
+                        int etatmachine = resultSet.getInt("etatmachine");
+                        
+                        Machine machine = new Machine(id, ref, des,puissance,etatmachine);
+                        Machines.add(machine);
+  
+        }
+  
+    }
+  }
+  
+  return Machines;
+  
+  }
+  
+  
   
     //Création des méthodes liées à la Table Machine 
     //Ici c'est la création de machine en fonction des différentes colonnes de la table
@@ -629,3 +655,4 @@ public class GestionBDD {
     
     
 }
+
