@@ -6,14 +6,20 @@ package com.insa.info_s3;
 
 import static com.insa.info_s3.GestionBDD.getTableValue;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.sidenav.SideNav;
+import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
@@ -30,12 +36,26 @@ import java.util.List;
  */
 
 @Route(value = "")
-public class UI extends VerticalLayout implements RouterLayout{
+public class UI extends AppLayout implements RouterLayout{
     
     public UI() {
         //contenu de la page de l'interface utilisateur
         try (Connection con = GestionBDD.connectSurServeurM3()){
-            H2 title = new H2 ("Binvenue dans la base donnée");
+            
+            DrawerToggle toggle = new DrawerToggle();
+
+            H1 title = new H1("Base de donnée");
+            title.getStyle().set("font-size", "var(--lumo-font-size-l)")
+                .set("margin", "0");
+
+            SideNav nav = getSideNav();
+
+            Scroller scroller = new Scroller(nav);
+            //scroller.setClassName(LumoUtility.Padding.SMALL);
+
+            addToDrawer(scroller);
+            addToNavbar(toggle, title);
+            /*H2 title = new H2 ("Binvenue dans la base donnée");
             Button produit = new Button ("produit");
             Button machine = new Button ("machine"); 
             Button realise = new Button ("réalise ");
@@ -104,11 +124,32 @@ public class UI extends VerticalLayout implements RouterLayout{
                 new RouterLink("Table produit", produit_View.class),
                 new RouterLink("Table machine", machine_View.class)
                         );
-            
+            */
         }
         catch (SQLException ex) {
             System.out.println("probleme : " + ex.getLocalizedMessage());
             ex.printStackTrace();
         }
-    }          
+    }       
+    
+    private SideNav getSideNav() {
+        SideNav sideNav = new SideNav();
+        sideNav.addItem(
+                //new SideNavItem("Dashboard", "/dashboard",
+                        //VaadinIcon.DASHBOARD.create()),
+                new SideNavItem("Orders", "/orders", VaadinIcon.CART.create()),
+                
+                new SideNavItem("Machine", "/machine_View",
+                        VaadinIcon.COGS.create()),
+                new SideNavItem("Produit", "/produit_View",
+                        VaadinIcon.PACKAGE.create()),
+                new SideNavItem("Opération", "/operation_View",
+                        VaadinIcon.HAMMER.create()),
+                new SideNavItem("Opérateur", "/operateur_View",
+                        VaadinIcon.USER.create()));
+                //new SideNavItem("Analytics", "/analytics",
+                        //VaadinIcon.CHART.create()));
+        return sideNav;
+    }
+    
 }
