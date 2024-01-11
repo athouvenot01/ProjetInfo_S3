@@ -10,10 +10,14 @@ import static com.insa.info_s3.GestionBDD.deleteOperation;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -38,8 +42,10 @@ public class operation_View extends Div {
         try (Connection con = GestionBDD.connectSurServeurM3()){
            
             H2 titre_View = new H2("Registre des opérations");
-            Button B1 = new Button ("voulez-vous supprimer une opération de la liste ?");
-            Button B2 = new Button ("voulez-vous ajouter une opération à la liste ?");
+            Button B1 = new Button ("Supprimer une opération",VaadinIcon.TRASH.create());
+            Button B2 = new Button ("Ajouter une opération",VaadinIcon.PLUS.create());
+            B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
+            B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             
             Button actualiser = new Button("Actualiser");
             actualiser.addClickListener(e -> {
@@ -48,7 +54,7 @@ public class operation_View extends Div {
             });
             
             B1.addClickListener(click -> {
-                TextField Nom1 = new TextField("entrez l'id de l'opération à supprimer");
+                TextField Nom1 = new TextField("id de l'opération");
                 Button valider = new Button ("entrer");
                 valider.addClickListener(enter -> {
                     String valeurTextField = Nom1.getValue();
@@ -70,6 +76,22 @@ public class operation_View extends Div {
             });
               
             B2.addClickListener(click -> {
+                
+                Dialog dialog = new Dialog();
+
+                dialog.setHeaderTitle("Nouvelle opération");
+
+                VerticalLayout dialogLayout = createDialogLayout();
+                dialog.add(dialogLayout);
+
+                Button saveButton = createSaveButton(dialog);
+                Button cancelButton = new Button("Cancel", e -> dialog.close());
+                dialog.getFooter().add(cancelButton);
+                dialog.getFooter().add(saveButton);
+
+
+                dialog.open();
+                /*
                 TextField type = new TextField("entrez l'id du type d'opération à ajouter");
                 TextField produit = new TextField("entrez l'id du produit à ajouter");
                 Button entrer = new Button("valider");
@@ -92,7 +114,7 @@ public class operation_View extends Div {
                 add(
                     type, 
                     produit, 
-                    entrer);
+                    entrer);*/
             });
             
          
@@ -139,5 +161,27 @@ public class operation_View extends Div {
 
         // Afficher la notification
         notification.open();
+    }
+    
+    private static VerticalLayout createDialogLayout() {
+
+        TextField id = new TextField("id du type d'opération ");
+        TextField des = new TextField("id du produit ");
+
+        VerticalLayout dialogLayout = new VerticalLayout(id,
+                des);
+        dialogLayout.setPadding(false);
+        dialogLayout.setSpacing(false);
+        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+
+        return dialogLayout;
+    }
+    
+    private static Button createSaveButton(Dialog dialog) {
+        Button saveButton = new Button("Add", e -> dialog.close());
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        return saveButton;
     }
 }
