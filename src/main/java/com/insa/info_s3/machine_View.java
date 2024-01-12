@@ -44,6 +44,8 @@ import java.util.List;
 @Route(value = "machine_View", layout = UI.class)
 public class machine_View extends Div {
     
+    
+    
     public machine_View() throws SQLException {
         try (Connection con = GestionBDD.connectSurServeurM3()){
             H2 titre_View = new H2("Registre des machines");
