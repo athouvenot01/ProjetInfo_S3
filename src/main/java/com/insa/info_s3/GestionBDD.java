@@ -249,7 +249,7 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             preparedStatement.setInt(3, idmateriaux);
             
             preparedStatement.executeUpdate();
-            System.out.println("Produit créée avec succès !");
+            System.out.println("Produit créé avec succès !");
         }
     }
     
@@ -294,7 +294,7 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             preparedStatement.setLong(3, duree);
 
             preparedStatement.executeUpdate();
-            System.out.println("Lien créée avec succès !");
+            System.out.println("Lien créé avec succès !");
         }
     }
     
