@@ -165,8 +165,9 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
                     String ref = resultSet.getString("ref");
                     String des = resultSet.getString("des");
                     int materiaux = resultSet.getInt("idmateriaux");
+                    int Poids = resultSet.getInt("poids");
                         
-                    Produits Produit = new Produits(id,ref,des,getNomMateriauxById(con, materiaux));
+                    Produits Produit = new Produits(id,ref,des,getNomMateriauxById(con, materiaux),Poids);
                     Produits.add(Produit);
                 }
             }

@@ -107,6 +107,7 @@ public class produit_View extends Div {
             grid.addColumn(Produits::getRef).setHeader("ref");
             grid.addColumn(Produits::getDes).setHeader("des");
             grid.addColumn(Produits::getMateriaux).setHeader("Matériaux");
+            grid.addColumn(Produits::getPoids).setHeader("Poids");
             grid.setItems(Produit);
 
             
