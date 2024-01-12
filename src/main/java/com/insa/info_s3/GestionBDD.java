@@ -179,6 +179,9 @@ public class GestionBDD {
         String sql = "DELETE FROM produit WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, produitID);
+            while (getIdByProduit(con, produitID) != 0) {
+                deleteOperation(con, getIdByProduit(con, produitID));
+            }
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
                 System.out.println("Produit supprimé avec succès !");
@@ -186,6 +189,21 @@ public class GestionBDD {
                 System.out.println("Aucun Produit trouvé avec l'ID : " + produitID);
             }
         }
+    }
+    
+    public static int getIdByProduit(Connection con, int idProduit) throws SQLException {
+        int idOperation = 0;
+        String sql = "SELECT id FROM operation WHERE idproduit = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idProduit);                        
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    idOperation = resultSet.getInt("id");
+                }
+            }
+        }
+        return idOperation;
     }
     
     //Ici création d'une réalisation
@@ -232,6 +250,8 @@ public class GestionBDD {
         String sql = "DELETE FROM operation WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, operationID);
+            deletePrecedeAvant(con, operationID);
+            deletePrecedeApres(con, operationID);
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
                 System.out.println("Opération supprimée avec succès !");
@@ -255,15 +275,28 @@ public class GestionBDD {
     }
     
     //Ici suppresion d'un lien 
-    public static void deletePrecede(Connection con, int precedeID) throws SQLException {
-        String sql = "DELETE FROM precede WHERE id = ?";
+    public static void deletePrecedeAvant(Connection con, int avant) throws SQLException {
+        String sql = "DELETE FROM precede WHERE opavant = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-            preparedStatement.setInt(1, precedeID);
+            preparedStatement.setInt(1, avant);
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
                 System.out.println("Suite supprimée avec succès !");
             } else {
-                System.out.println("Aucune suite trouvée avec l'ID : " + precedeID);
+                System.out.println("Aucune suite trouvée avec l'opération avant : " + avant);
+            }
+        }
+    }
+    
+    public static void deletePrecedeApres(Connection con, int apres) throws SQLException {
+        String sql = "DELETE FROM precede WHERE opapres = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, apres);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Suite supprimée avec succès !");
+            } else {
+                System.out.println("Aucune suite trouvée avec l'opération avant : " + apres);
             }
         }
     }
@@ -306,11 +339,14 @@ public class GestionBDD {
         }
     }
     
-    //Ici suppresion d'une machine 
+    //Ici suppresion d'une materiaux 
     public static void deleteMateriaux(Connection con, int materiauxId) throws SQLException {
         String sql = "DELETE FROM materiaux WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, materiauxId);
+            while (getIdByMateriaux(con, materiauxId) != 0) {
+                deleteProduit(con, getIdByMateriaux(con, materiauxId));
+            }
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
                 System.out.println("Matériaux supprimé avec succès !");
@@ -318,6 +354,21 @@ public class GestionBDD {
                 System.out.println("Aucun matériaux trouvé avec l'ID : " + materiauxId);
             }
         }
+    }
+    
+    public static int getIdByMateriaux(Connection con, int idMateriaux) throws SQLException {
+        int idProduit = 0;
+        String sql = "SELECT id FROM produit WHERE idmateriaux = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idMateriaux);                        
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    idProduit = resultSet.getInt("id");
+                }
+            }
+        }
+        return idProduit;
     }
     
     //Ici c'est la création d'un opérateur
