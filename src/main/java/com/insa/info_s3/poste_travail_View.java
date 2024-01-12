@@ -4,10 +4,9 @@
  */
 package com.insa.info_s3;
 
+import static com.insa.info_s3.GestionBDD.createPosteTravail;
 import static com.insa.info_s3.GestionBDD.createMachine;
-import static com.insa.info_s3.GestionBDD.deleteProduit;
-import com.insa.info_s3.Machines.Machine;
-import com.vaadin.flow.component.Key;
+import com.insa.info_s3.PosteDeTravail.PosteDeTravaille;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -21,7 +20,6 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import java.sql.Connection;
@@ -32,25 +30,21 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  *
  * @author loicrosian
  */
 
-@Route(value = "machine_View", layout = UI.class)
-public class machine_View extends Div {
+@Route(value = "posteTravail_View", layout = UI.class)
+public class poste_travail_View extends Div {
     
+    private Grid<PosteDeTravail.PosteDeTravaille> grid = new Grid<>();
     
-    
-    public machine_View() throws SQLException {
+    public poste_travail_View() throws SQLException {
         try (Connection con = GestionBDD.connectSurServeurM3()){
-            H2 titre_View = new H2("Registre des machines");
-            Button B1 = new Button ("Supprimer une machine ",VaadinIcon.TRASH.create());
-            Button B2 = new Button ("Ajouter une machine",VaadinIcon.PLUS.create());
+            H2 titre_View = new H2("Registre des postes de travail");
+            Button B1 = new Button ("Supprimer un poste de travail ",VaadinIcon.TRASH.create());
+            Button B2 = new Button ("Ajouter un poste de travail",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             
@@ -86,7 +80,7 @@ public class machine_View extends Div {
                 
                 Dialog dialog = new Dialog();
 
-                dialog.setHeaderTitle("Nouvelle machine");
+                dialog.setHeaderTitle("Nouveau poste de travail");
 
                 VerticalLayout dialogLayout;
                 
@@ -115,14 +109,11 @@ public class machine_View extends Div {
             });
             
             // Créer une grille avec les colonnes
-            List<Machine> Machines = GestionBDD.Getmachine(con);
-            Grid<Machine> grid = new Grid<>();
-            grid.addColumn(Machine::getId).setHeader("Id");
-            grid.addColumn(Machine::getRef).setHeader("ref");
-            grid.addColumn(Machine::getDes).setHeader("des");
-            grid.addColumn(Machine::getPuissance).setHeader("Puissance");
-            grid.addColumn(Machine::getEtatmachine).setHeader("Etat Machine");
-            grid.setItems(Machines);
+            List<PosteDeTravail.PosteDeTravaille> PosteDeTravail = GestionBDD.GetPostedeTravail(con);
+            grid.addColumn(PosteDeTravaille::getId).setHeader("id");
+            grid.addColumn(PosteDeTravaille::getIdoperateur).setHeader("id opérateur");
+            grid.addColumn(PosteDeTravaille::getIdmachine).setHeader("id machine");
+            grid.setItems(PosteDeTravail);
            
             add(
                 titre_View, 
@@ -150,29 +141,10 @@ public class machine_View extends Div {
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
     Connection con = GestionBDD.connectSurServeurM3();
     
-    TextField id = new TextField("Référence");
-    TextField des = new TextField("Description");
+    IntegerField idmachine = new IntegerField("id de la machine");
+    IntegerField idoperateur = new IntegerField("id de l'opérateur");
     
-    IntegerField puissance = new IntegerField("Puissance");
-    Div WSufix = new Div();
-    WSufix.setText("Watt");
-    puissance.setSuffixComponent(WSufix);
-    
-    List<String> items = new ArrayList<>(
-            Arrays.asList("Inactif", "Actif"));
-    
-    ComboBox<String> comboBox = new ComboBox<>("Etat de la machine ");
-    comboBox.setAllowCustomValue(true);
-    comboBox.addCustomValueSetListener(e -> {
-        String customValue = e.getDetail();
-        items.add(customValue);
-        comboBox.setItems(items);
-        comboBox.setValue(customValue);
-        });
-    comboBox.setItems(items);
-    comboBox.setHelperText("sélectionner l'état de la machine");
-   
-    VerticalLayout dialogLayout = new VerticalLayout(id, des, puissance, comboBox);
+    VerticalLayout dialogLayout = new VerticalLayout(idmachine, idoperateur);
     dialogLayout.setPadding(false);
     dialogLayout.setSpacing(false);
     dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
@@ -183,10 +155,8 @@ public class machine_View extends Div {
     saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     saveButton.addClickListener(e -> {
         try {
-            int state = getValueComboBox(comboBox);
-            createMachine(con, id.getValue(), des.getValue(), puissance.getValue(), state);
+            createPosteTravail(con, idmachine.getValue(), idoperateur.getValue());
             dialog.close();
-            
         } catch (SQLException ex) {
             // Gérer l'exception, par exemple, afficher un message d'erreur
             ex.printStackTrace();
@@ -209,3 +179,4 @@ public class machine_View extends Div {
     }
     }
 }
+
