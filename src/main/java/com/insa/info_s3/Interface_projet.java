@@ -10,6 +10,7 @@ import com.vaadin.flow.theme.Theme;
 import jakarta.annotation.PostConstruct;
 import java.awt.Desktop;
 import java.net.URI;
+import java.sql.SQLException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -30,7 +31,10 @@ public class Interface_projet
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        SpringApplication.run(Interface_projet.class, args);
+        
+            SpringApplication.run(Interface_projet.class, args);
+        
+        
     }
     
     

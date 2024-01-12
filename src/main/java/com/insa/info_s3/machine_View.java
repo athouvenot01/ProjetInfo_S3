@@ -19,6 +19,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
@@ -52,7 +53,7 @@ public class machine_View extends Div {
             });
             
             B1.addClickListener(click -> {
-                TextField Nom1 = new TextField("id de la machine");
+                /*TextField Nom1 = new TextField("id de la machine");
                 Button valider = new Button ("entrer");
                 valider.addClickListener(enter -> {
                     String valeurTextField = Nom1.getValue();
@@ -70,7 +71,7 @@ public class machine_View extends Div {
                 valider.addClickShortcut(Key.ENTER);
                 add(
                     Nom1,
-                    valider);
+                    valider);*/
             });
               
             B2.addClickListener(click -> {
@@ -80,21 +81,28 @@ public class machine_View extends Div {
                 dialog.setHeaderTitle("Nouvelle machine");
 
                 VerticalLayout dialogLayout;
+                
                 try {
-                    dialogLayout = createDialogLayout();
+                    dialogLayout = createDialogLayout(dialog, con);
                     dialog.add(dialogLayout);
+                    //Button saveButton = createSaveButton(dialog);
+                    Button cancelButton = new Button("Cancel", e -> dialog.close());
+                    dialog.getFooter().add(cancelButton);
+                    //dialog.getFooter().add(saveButton);
+
+
+                dialog.open();
                 } catch (SQLException ex) {
                     Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
+                
 
                 //Button saveButton = createSaveButton(dialog);
-                Button cancelButton = new Button("Cancel", e -> dialog.close());
-                dialog.getFooter().add(cancelButton);
+                //Button cancelButton = new Button("Cancel", e -> dialog.close());
+                //dialog.getFooter().add(cancelButton);
                 //dialog.getFooter().add(saveButton);
-
-
-                dialog.open();
+                //dialog.open();
             });
             
             // Créer une grille avec les colonnes
@@ -117,7 +125,7 @@ public class machine_View extends Div {
     }
 
     
-    public void afficherNotification(String message) {
+    public void afficherNotification(String message) throws SQLException {
         // Créer une notification
         Notification notification = new Notification(
                 message,
@@ -129,17 +137,13 @@ public class machine_View extends Div {
         notification.open();
     }
     
-    private static VerticalLayout createDialogLayout() throws SQLException {
-        
-        try (Connection con = GestionBDD.connectSurServeurM3()){
+    private static VerticalLayout createDialogLayout(Dialog dialog,Connection con) throws SQLException {
 
             TextField id = new TextField("référence ");
             TextField des = new TextField("description ");
-            NumberField puissance = new NumberField("puissance");
-            NumberField etat_machine = new NumberField("état de la machine ");
-            
-            int nombreInt = (int) puissance.getValue();
-           
+            IntegerField puissance = new IntegerField("puissance");
+            IntegerField etat_machine = new IntegerField("état de la machine ");
+         
 
             VerticalLayout dialogLayout = new VerticalLayout(id,
                 des,puissance, etat_machine);
@@ -149,11 +153,23 @@ public class machine_View extends Div {
             dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
         
             Button saveButton = new Button("Add");
-            saveButton.addClickListener(e-> {
-                
-                createMachine(con,id.getValue(),des.getValue(), nombreInt, etat_machine.getValue());
-               
-            });
+            saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            dialog.getFooter().add(saveButton);
+            saveButton.addClickListener(e -> {
+    
+    
+                try {
+                    createMachine(con, id.getValue(), des.getValue(), puissance.getValue(), etat_machine.getValue());
+                } catch (SQLException ex) {
+                    Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        dialog.close();
+  
+});
+              
+            
+            
+          
 
             return dialogLayout;
             
@@ -173,4 +189,4 @@ public class machine_View extends Div {
         r   eturn saveButton;
 
         }*/
-}
+
