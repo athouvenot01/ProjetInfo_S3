@@ -8,7 +8,6 @@ import static com.insa.info_s3.GestionBDD.createOperation;
 import static com.insa.info_s3.GestionBDD.createMachine;
 import static com.insa.info_s3.GestionBDD.deleteOperation;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
-import com.insa.info_s3.Machines.Machine;
 import com.insa.info_s3.Operations.Operation;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;

@@ -41,7 +41,7 @@ import java.util.List;
 
 @Route(value = "operateur_View", layout = UI.class)
 public class operateur_View extends Div {
-
+    private Grid<Operateur> grid = new Grid<>();
     public operateur_View() throws SQLException{
        
         try (Connection con = GestionBDD.connectSurServeurM3()){
@@ -107,7 +107,6 @@ public class operateur_View extends Div {
             
             // Créer une grille avec les colonnes
             List<Operateurs.Operateur> Operateurs = GestionBDD.GetOperateur(con);
-            Grid<Operateurs.Operateur> grid = new Grid<>();
             grid.addColumn(Operateur::getPrenom).setHeader("Prenom");
             grid.addColumn(Operateur::getNom).setHeader("Nom");
             grid.addColumn(Operateur::getIdmachine).setHeader("id machine");
