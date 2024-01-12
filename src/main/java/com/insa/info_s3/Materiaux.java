@@ -9,12 +9,12 @@ package com.insa.info_s3;
  * @author Emilien
  */
 public class Materiaux {
-    public static class Machine {
+    public static class materiaux {
         private String des;
         private int prix;
         private int id;
     
-     public Machine(int id,String des, int prix) {
+     public materiaux(int id,String des, int prix) {
             this.id = id;
             this.des = des;
             this.prix = prix;

@@ -5,6 +5,10 @@
 package com.insa.info_s3;
 
 import com.insa.info_s3.Machines.Machine;
+import com.insa.info_s3.Materiaux.materiaux;
+import com.insa.info_s3.Operateurs.Operateur;
+import com.insa.info_s3.Operations.Operation;
+import com.insa.info_s3.PosteDeTravail.PosteDeTravaille;
 import com.insa.info_s3.Produit.Produits;
 import java.io.BufferedReader;
 import java.io.File;
@@ -51,7 +55,81 @@ public class GestionBDD {
                 "m3_lrosian01", "m3_lrosian01",
                 "30ea71e6");
     }
+   
+    public static List<materiaux> GetMateriaux(Connection con) throws SQLException {
+    List<materiaux> Materiaux = new ArrayList<>();
+    String sql = "SELECT * FROM materiaux";
     
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql);
+         ResultSet resultSet = preparedStatement.executeQuery()) {
+        
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String des = resultSet.getString("des");
+            int prix = resultSet.getInt("prix");
+            
+            materiaux materiau = new materiaux(id, des, prix);
+            Materiaux.add(materiau);
+        }
+    }
+    return Materiaux;
+}
+      public static List<Operation> GetOperation(Connection con) throws SQLException {
+    List<Operation> operation = new ArrayList<>();
+    String sql = "SELECT * FROM materiaux";
+    
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql);
+         ResultSet resultSet = preparedStatement.executeQuery()) {
+        
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String des = resultSet.getString("des");
+      
+            Operation operations = new Operation(id, des);
+            operation.add(operations);
+        }
+    }
+    return operation;
+}
+    public static List<Operateur> GetOperateur(Connection con) throws SQLException {
+    List<Operateur> operateur = new ArrayList<>();
+    String sql = "SELECT * FROM operateur";
+    
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql);
+         ResultSet resultSet = preparedStatement.executeQuery()) {
+        
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String prenom = resultSet.getString("prenom");
+            String nom = resultSet.getString("nom");
+            int etatoperateur = resultSet.getInt("idoperateur");
+            
+            
+            Operateur operateurs = new Operateur(id, prenom,nom,etatoperateur);
+            operateur.add(operateurs);
+        }
+    }
+    return operateur;
+}
+public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQLException {
+    List<PosteDeTravaille> Poste = new ArrayList<>();
+    String sql = "SELECT * FROM postedetravail";
+    
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql);
+         ResultSet resultSet = preparedStatement.executeQuery()) {
+        
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            int idmachine = resultSet.getInt("idmachine");
+            int idoperateur = resultSet.getInt("idoperateur");
+            
+            PosteDeTravaille poste = new PosteDeTravaille(id, idmachine, idoperateur);
+            Poste.add(poste);
+        }
+    }
+    return Poste;
+}
+
    public static List<Machine> Getmachine(Connection con) throws SQLException {
     List<Machine> machines = new ArrayList<>();
     String sql = "SELECT * FROM machine";
@@ -72,7 +150,6 @@ public class GestionBDD {
             machines.add(machine);
         }
     }
-    
     return machines;
 }
 
