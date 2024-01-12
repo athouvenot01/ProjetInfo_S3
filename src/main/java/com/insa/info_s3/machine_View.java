@@ -25,6 +25,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,7 +41,7 @@ public class machine_View extends Div {
     
     public machine_View() throws SQLException {
         try (Connection con = GestionBDD.connectSurServeurM3()){
-            H2 titre_View = new H2("Registre des produits");
+            H2 titre_View = new H2("Registre des machines");
             Button B1 = new Button ("Supprimer une machine ",VaadinIcon.TRASH.create());
             Button B2 = new Button ("Ajouter une machine",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
@@ -83,12 +84,13 @@ public class machine_View extends Div {
                 VerticalLayout dialogLayout;
                 
                 try {
-                    dialogLayout = createDialogLayout(dialog, con);
+
+                    dialogLayout = createDialogLayout(dialog);
+
                     dialog.add(dialogLayout);
-                    //Button saveButton = createSaveButton(dialog);
                     Button cancelButton = new Button("Cancel", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
-                    //dialog.getFooter().add(saveButton);
+                    
 
 
                 dialog.open();
@@ -113,7 +115,6 @@ public class machine_View extends Div {
             grid.addColumn(Machine::getDes).setHeader("des");
             grid.addColumn(Machine::getPuissance).setHeader("Puissance");
             grid.addColumn(Machine::getEtatmachine).setHeader("Etat Machine");
-            
             grid.setItems(Machines);
            
             add(
@@ -137,56 +138,47 @@ public class machine_View extends Div {
         notification.open();
     }
     
-    private static VerticalLayout createDialogLayout(Dialog dialog,Connection con) throws SQLException {
 
-            TextField id = new TextField("référence ");
-            TextField des = new TextField("description ");
-            IntegerField puissance = new IntegerField("puissance");
-            IntegerField etat_machine = new IntegerField("état de la machine ");
-         
-
-            VerticalLayout dialogLayout = new VerticalLayout(id,
-                des,puissance, etat_machine);
-            dialogLayout.setPadding(false);
-            dialogLayout.setSpacing(false);
-            dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
-            dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
-        
-            Button saveButton = new Button("Add");
-            saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            dialog.getFooter().add(saveButton);
-            saveButton.addClickListener(e -> {
+    private static VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
+    Connection con = GestionBDD.connectSurServeurM3();
     
+    TextField id = new TextField("Référence");
+    TextField des = new TextField("Description");
     
-                try {
-                    createMachine(con, id.getValue(), des.getValue(), puissance.getValue(), etat_machine.getValue());
-                } catch (SQLException ex) {
-                    Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
-                }
-        dialog.close();
-  
-});
-              
-            
-            
-          
+    NumberField puissance = new NumberField("Puissance");
+    Div WSufix = new Div();
+    WSufix.setText("Watt");
+    puissance.setSuffixComponent(WSufix);
+    
+    NumberField etat_machine = new NumberField("État de la machine");
 
-            return dialogLayout;
+    VerticalLayout dialogLayout = new VerticalLayout(id, des, puissance, etat_machine);
+    dialogLayout.setPadding(false);
+    dialogLayout.setSpacing(false);
+    dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+    dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+
+    Button saveButton = new Button("Add");
+    dialog.getFooter().add(saveButton);
+    saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+    saveButton.addClickListener(e -> {
+        try {
+            int puissanceInt = puissance.getValue().intValue();
+            int etat_machineInt = etat_machine.getValue().intValue();
+            createMachine(con, id.getValue(), des.getValue(), puissanceInt, etat_machineInt);
+            dialog.close();
             
+        } catch (SQLException ex) {
+            // Gérer l'exception, par exemple, afficher un message d'erreur
+            ex.printStackTrace();
+
         }
-       
-    }
-    
-    
-    /*private static Button createSaveButton(Dialog dialog) {
-        try (Connection con = GestionBDD.connectSurServeurM3()){
-            Button saveButton = new Button("Add");
-            saveButton.addClickListener(click -> {
-            createMachine(con, id.getValue);
-            });
-            saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        
-        r   eturn saveButton;
+    });
 
-        }*/
+    
 
+    return dialogLayout;
+}
+    private List<String> items = new ArrayList<>(
+            Arrays.asList("0", "1"));
+}
