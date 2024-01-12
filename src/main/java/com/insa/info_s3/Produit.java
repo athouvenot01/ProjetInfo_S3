@@ -14,13 +14,14 @@ public class Produit {
         private String ref;
         private String des;
         private String materiaux;
-        
+        private double poids;
 
-        public Produits (int id, String ref, String des, String materiaux) {
+        public Produits (int id, String ref, String des, String materiaux,double poids) {
             this.id = id;
             this.ref = ref;
             this.des = des;
             this.materiaux = materiaux;
+            this.poids = poids;
            
         }
         public String getDes() {
@@ -54,6 +55,14 @@ public class Produit {
             this.materiaux = materiaux;
         }
 
+        public double getPoids() {
+            return poids;
+        }
+
+        public void setPoids(double poids) {
+            this.poids = poids;
+        }
+        
        
     }
 }
