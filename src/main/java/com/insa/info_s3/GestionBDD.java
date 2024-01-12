@@ -4,6 +4,7 @@
  */
 package com.insa.info_s3;
 
+import com.insa.info_s3.Clients.Client;
 import com.insa.info_s3.Machines.Machine;
 import com.insa.info_s3.Materiaux.materiaux;
 import com.insa.info_s3.Operateurs.Operateur;
@@ -56,8 +57,8 @@ public class GestionBDD {
                 "30ea71e6");
     }
     
-    public static List<Clients> GetClients (Connection con) throws SQLException{
-        List<Clients> Clients  = new ArrayList <>();
+    public static List<Client> GetClients (Connection con) throws SQLException{
+        List<Client> Clients  = new ArrayList <>();
         String sql = "SELECT * FROM client";
         try  (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -65,9 +66,7 @@ public class GestionBDD {
                     int id = resultSet.getInt("id");
                     String prenom = resultSet.getString("prenom");
                     String nom = resultSet.getString("nom");
-                    
-                        
-                    Clients client = new Clients(id,prenom,nom);
+                    Client client = new Client(id,prenom,nom);
                     Clients.add(client);
                 }
             }

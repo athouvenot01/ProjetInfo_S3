@@ -4,7 +4,7 @@
  */
 package com.insa.info_s3;
 
-import com.insa.info_s3.Clients.client;
+import com.insa.info_s3.Clients.Client;
 import static com.insa.info_s3.GestionBDD.createClient;
 import static com.insa.info_s3.GestionBDD.createMachine;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
@@ -46,7 +46,7 @@ import java.util.List;
 @Route(value = "clients_View", layout = UI.class)
 public class Clients_View extends Div{
     
-    private Grid<Clients.client> grid = new Grid<>();
+    private Grid<Client> grid = new Grid<>();
     
     public Clients_View() throws SQLException{
         try (Connection con = GestionBDD.connectSurServeurM3()){
@@ -110,11 +110,11 @@ public class Clients_View extends Div{
             });
             
             // Créer une grille avec les colonnes
-            List<Clients> Clients = GestionBDD.GetClients(con);
-            grid.addColumn(client::getId).setHeader("Id");
-            grid.addColumn(client::getPrenom).setHeader("Prenom");
-            grid.addColumn(client::getNom).setHeader("Nom");
-            //grid.setItems(Clients);
+            List<Client> Clients = GestionBDD.GetClients(con);
+            grid.addColumn(Client::getId).setHeader("Id");
+            grid.addColumn(Client::getPrenom).setHeader("Prenom");
+            grid.addColumn(Client::getNom).setHeader("Nom");
+            grid.setItems(Clients);
            
             add(
                 titre_View, 
