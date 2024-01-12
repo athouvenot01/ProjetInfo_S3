@@ -38,7 +38,7 @@ import java.util.Set;
 
 @Route(value = "produit_View", layout = UI.class)
 public class produit_View extends Div {
-    
+    private Grid<Produits> grid = new Grid<>();
     public produit_View() throws SQLException {
         
         Connection con = GestionBDD.connectSurServeurM3();
@@ -103,7 +103,6 @@ public class produit_View extends Div {
             
          
             List<Produits> Produit = GestionBDD.GetProduits(con);
-            Grid<Produits> grid = new Grid<>();
             grid.addColumn(Produits::getId).setHeader("Id");
             grid.addColumn(Produits::getRef).setHeader("ref");
             grid.addColumn(Produits::getDes).setHeader("des");
@@ -126,14 +125,12 @@ public class produit_View extends Div {
         
                     Produits selectedBean = selectedItems.iterator().next();
                     int prop1Value = selectedBean.getId();
-                    try {GestionBDD.deleteProduit(con, prop1Value);}
-                    catch (SQLException ex) {
-                    // Gérer l'exception, par exemple, afficher un message d'erreur
-                        ex.printStackTrace();
-                    }
+                    try {GestionBDD.deleteProduit(con, prop1Value);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateProduit(con);} catch (SQLException ex){ex.printStackTrace();}
                     
                     Notification.show("Produit "+ selectedBean.getDes()+" supprimé avec succès : " , 5000, Notification.Position.TOP_CENTER);
                 }
+                
             });
     
     }
@@ -171,6 +168,10 @@ public class produit_View extends Div {
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         return saveButton;
+    }
+    private void UpdateProduit (Connection con) throws SQLException{
+    List<Produits> Produit = GestionBDD.GetProduits(con);
+    grid.setItems(Produit);
     }
     
 }
