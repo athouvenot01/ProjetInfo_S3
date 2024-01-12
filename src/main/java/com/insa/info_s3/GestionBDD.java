@@ -52,69 +52,62 @@ public class GestionBDD {
                 "30ea71e6");
     }
     
-  public static List<Machine> Getmachine (Connection con )throws SQLException{
-  List<Machine> Machines  = new ArrayList <>();
-  String sql = "SELECT * FROM machine";
-  try  (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-    try (ResultSet resultSet = preparedStatement.executeQuery()) {
-      while (resultSet.next()) {
-                        int id = resultSet.getInt("id");
-                        String ref = resultSet.getString("ref");
-                        String des = resultSet.getString("des");
-                        int puissance = resultSet.getInt("puissance");
-                        int etatmachine = resultSet.getInt("etatmachine");
+    public static List<Machine> Getmachine (Connection con )throws SQLException{
+        List<Machine> Machines  = new ArrayList <>();
+        String sql = "SELECT * FROM machine";
+        try  (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String ref = resultSet.getString("ref");
+                    String des = resultSet.getString("des");
+                    int puissance = resultSet.getInt("puissance");
+                    int etatmachine = resultSet.getInt("etatmachine");
                         
-                        Machine machine = new Machine(id, ref, des,puissance,etatmachine);
-                        Machines.add(machine);
-  
-        }
-  
-    }
-  }
-  
-  return Machines;
-  
-  }
-  public static List<Produits> GetProduits (Connection con) throws SQLException{
-  List<Produits> Produits  = new ArrayList <>();
-  String sql = "SELECT * FROM produit";
-  try  (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-    try (ResultSet resultSet = preparedStatement.executeQuery()) {
-      while (resultSet.next()) {
-                        int id = resultSet.getInt("id");
-                        String ref = resultSet.getString("ref");
-                        String des = resultSet.getString("des");
-                        int materiaux = resultSet.getInt("idmateriaux");
-                        
-        
-                        
-                        Produits Produit = new Produits(id,ref,des,getNomMateriauxById(con, materiaux));
-                        Produits.add(Produit);
-        }
-  
-    }
-  }
-  return Produits;
-  }
-  public static String getNomMateriauxById(Connection con, int idMateriaux) throws SQLException {
-    String nomMateriaux = null;
-    String sql = "SELECT des FROM materiaux WHERE id = ?";
-
-    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-        preparedStatement.setInt(1, idMateriaux);
-
-        try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (resultSet.next()) {
-                nomMateriaux = resultSet.getString("des");
+                    Machine machine = new Machine(id, ref, des,puissance,etatmachine);
+                    Machines.add(machine);
+                }
             }
         }
+        return Machines;
     }
+    
+    
+    public static List<Produits> GetProduits (Connection con) throws SQLException{
+        List<Produits> Produits  = new ArrayList <>();
+        String sql = "SELECT * FROM produit";
+        try  (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String ref = resultSet.getString("ref");
+                    String des = resultSet.getString("des");
+                    int materiaux = resultSet.getInt("idmateriaux");
+                        
+                    Produits Produit = new Produits(id,ref,des,getNomMateriauxById(con, materiaux));
+                    Produits.add(Produit);
+                }
+            }
+        }
+        return Produits;
+    }
+    
+    
+    public static String getNomMateriauxById(Connection con, int idMateriaux) throws SQLException {
+        String nomMateriaux = null;
+        String sql = "SELECT des FROM materiaux WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idMateriaux);
 
-    return nomMateriaux;
-}
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    nomMateriaux = resultSet.getString("des");
+                }
+            }
+        }
+        return nomMateriaux;
+    }
  
-  
-  
 
     //Création des méthodes liées à la Table Machine 
     //Ici c'est la création de machine en fonction des différentes colonnes de la table
