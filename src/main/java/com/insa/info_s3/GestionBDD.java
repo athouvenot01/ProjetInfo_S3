@@ -134,6 +134,8 @@ public class GestionBDD {
         String sql = "DELETE FROM machine WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, machineId);
+            deletePosteTravailMachine(con, machineId);
+            deleteRealiseMachine(con, machineId);
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
                 System.out.println("Machine supprimée avec succès !");
@@ -220,15 +222,28 @@ public class GestionBDD {
     }
     
     //Ici suppresion d'une réalisation 
-    public static void deleteRealise(Connection con, int realiseID) throws SQLException {
-        String sql = "DELETE FROM realise WHERE id = ?";
+    public static void deleteRealiseMachine(Connection con, int machineID) throws SQLException {
+        String sql = "DELETE FROM realise WHERE idmachine = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-            preparedStatement.setInt(1, realiseID);
+            preparedStatement.setInt(1, machineID);
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
                 System.out.println("lien supprimé avec succès !");
             } else {
-                System.out.println("Aucun lien trouvé avec l'ID : " + realiseID);
+                System.out.println("Aucun lien trouvé avec l'ID : " + machineID);
+            }
+        }
+    }
+    
+    public static void deleteRealiseType(Connection con, int typeID) throws SQLException {
+        String sql = "DELETE FROM realise WHERE idtype = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, typeID);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("lien supprimé avec succès !");
+            } else {
+                System.out.println("Aucun lien trouvé avec l'ID : " + typeID);
             }
         }
     }
@@ -301,6 +316,20 @@ public class GestionBDD {
         }
     }
     
+    public static void deletePrecedeAvantApres(Connection con, int avant, int apres) throws SQLException {
+        String sql = "DELETE FROM precede WHERE opavant = ? AND opapres = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, avant);
+            preparedStatement.setInt(2, apres);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Suite supprimée avec succès !");
+            } else {
+                System.out.println("Aucune suite trouvée avec l'opération avant : " + apres);
+            }
+        }
+    }
+    
     //ici Création d'un nouveau type opération
     public static void createTypeOperation(Connection con, String des) throws SQLException {
         String sql = "INSERT INTO typeoperation (des) VALUES (?)"; 
@@ -317,6 +346,10 @@ public class GestionBDD {
         String sql = "DELETE FROM typeoperation WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, TypeoperationID);
+            deleteRealiseType(con, TypeoperationID);
+            while (getIdByType(con, TypeoperationID) != 0) {
+                deleteOperation(con, getIdByType(con, TypeoperationID));
+            }
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
                 System.out.println("Type Opération supprimé avec succès !");
@@ -326,6 +359,20 @@ public class GestionBDD {
         }
     }
     
+    public static int getIdByType(Connection con, int idType) throws SQLException {
+        int idOperation = 0;
+        String sql = "SELECT id FROM operation WHERE idtype = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idType);                        
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    idOperation = resultSet.getInt("id");
+                }
+            }
+        }
+        return idOperation;
+    }
     
     //Ici c'est la création de materiaux
     public static void createMateriaux(Connection con, String des, double prix) throws SQLException {
@@ -389,6 +436,7 @@ public class GestionBDD {
         String sql = "DELETE FROM operateur WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, operateurId);
+            deletePosteTravailOperateur(con, operateurId);
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
                 System.out.println("Opérateur supprimé avec succès !");
@@ -419,7 +467,33 @@ public class GestionBDD {
             if (rowCount > 0) {
                 System.out.println("Poste de Travail supprimé avec succès !");
             } else {
-                System.out.println("Aucun pote de travail trouvé avec l'ID : " + posteTravailId);
+                System.out.println("Aucun poste de travail trouvé avec l'ID : " + posteTravailId);
+            }
+        }
+    }
+    
+    public static void deletePosteTravailOperateur(Connection con, int OperateurId) throws SQLException {
+        String sql = "DELETE FROM postetravail WHERE idoperateur = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, OperateurId);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Poste de Travail supprimé avec succès !");
+            } else {
+                System.out.println("Aucun poste de travail trouvé avec l'ID : " + OperateurId);
+            }
+        }
+    }
+    
+    public static void deletePosteTravailMachine(Connection con, int MachineId) throws SQLException {
+        String sql = "DELETE FROM postetravail WHERE idmachine = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, MachineId);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Poste de Travail supprimé avec succès !");
+            } else {
+                System.out.println("Aucun poste de travail trouvé avec l'ID : " + MachineId);
             }
         }
     }
@@ -770,6 +844,7 @@ public class GestionBDD {
             creeBase(con);
             //createMachine(con,"F04","rapide",30);
             lecture(con, new File("lecture.txt"));
+            deleteOperateur(con, 1);
         } catch (SQLException ex) {
             System.err.println("Code d'erreur SQL : " + ex.getErrorCode());
             System.err.println("Message d'erreur SQL : " + ex.getMessage());
