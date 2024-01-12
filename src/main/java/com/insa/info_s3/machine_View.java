@@ -105,13 +105,6 @@ public class machine_View extends Div {
                     Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
-                
-
-                //Button saveButton = createSaveButton(dialog);
-                //Button cancelButton = new Button("Cancel", e -> dialog.close());
-                //dialog.getFooter().add(cancelButton);
-                //dialog.getFooter().add(saveButton);
-                //dialog.open();
             });
             
             // Créer une grille avec les colonnes

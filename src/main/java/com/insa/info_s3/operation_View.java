@@ -5,12 +5,15 @@
 package com.insa.info_s3;
 
 import static com.insa.info_s3.GestionBDD.createOperation;
-import static com.insa.info_s3.GestionBDD.createProduit;
+import static com.insa.info_s3.GestionBDD.createMachine;
 import static com.insa.info_s3.GestionBDD.deleteOperation;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
+import com.insa.info_s3.Machines.Machine;
+import com.insa.info_s3.Operations.Operation;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
@@ -20,14 +23,21 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -37,7 +47,9 @@ import java.util.logging.Logger;
 @Route(value = "operation_View", layout = UI.class)
 public class operation_View extends Div {
     
-    public operation_View() {
+    private Grid<Operations.Operation> grid = new Grid<>();
+    
+    public operation_View() throws SQLException {
         
         try (Connection con = GestionBDD.connectSurServeurM3()){
            
@@ -79,61 +91,32 @@ public class operation_View extends Div {
                 
                 Dialog dialog = new Dialog();
 
-                dialog.setHeaderTitle("Nouvelle opération");
+                dialog.setHeaderTitle("Nouvelle Operation");
 
-                VerticalLayout dialogLayout = createDialogLayout();
-                dialog.add(dialogLayout);
+                VerticalLayout dialogLayout;
+                
+                try {
 
-                Button saveButton = createSaveButton(dialog);
-                Button cancelButton = new Button("Cancel", e -> dialog.close());
-                dialog.getFooter().add(cancelButton);
-                dialog.getFooter().add(saveButton);
+                    dialogLayout = createDialogLayout(dialog);
+
+                    dialog.add(dialogLayout);
+                    Button cancelButton = new Button("Cancel", e -> dialog.close());
+                    dialog.getFooter().add(cancelButton);
+                    
 
 
                 dialog.open();
-                /*
-                TextField type = new TextField("entrez l'id du type d'opération à ajouter");
-                TextField produit = new TextField("entrez l'id du produit à ajouter");
-                Button entrer = new Button("valider");
-             
-                entrer.addClickListener(enter -> {
-                    String valeur_type = type.getValue();
-                    String valeur_prod = produit.getValue();
-                    try {
-                        // Convertir la valeur en int
-                        int idtype = Integer.parseInt(valeur_type);
-                        int idproduit = Integer.parseInt(valeur_prod);
-                        createOperation(con, idtype, idproduit);
-                    } catch (NumberFormatException ex) {
-                        afficherNotification("Veuillez saisir un entier valide");
-                    }catch (SQLException ex) {
-                        Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                });
-                        
-                add(
-                    type, 
-                    produit, 
-                    entrer);*/
+                } catch (Exception ex) {
+                    Logger.getLogger(operation_View.class.getName()).log(Level.SEVERE, null, ex);
+                }
             });
             
          
-            // Données pour la grille (liste de listes)
-            List<List<String>> donnees = Arrays.asList(
-                Arrays.asList("A1", "B1", "C1"),
-                Arrays.asList("A2", "B2", "C2"),
-                Arrays.asList("A3", "B3", "C3")
-            );
-
             // Créer une grille avec les colonnes
-            Grid<List<String>> grid = new Grid<>();
-            grid.setItems(donnees);
-
-            // Ajouter des colonnes à la grille
-            for (int i = 0; i < donnees.get(0).size(); i++) {
-                int indiceColonne = i;
-                grid.addColumn(item -> item.get(indiceColonne)).setHeader("Colonne " + (indiceColonne + 1));
-            }
+            List<Operations.Operation> Operations = GestionBDD.GetOperation(con);
+            grid.addColumn(Operation::getId).setHeader("Id");
+            grid.addColumn(Operation::getDes).setHeader("des");
+            grid.setItems(Operations);
 
             
             
@@ -163,25 +146,35 @@ public class operation_View extends Div {
         notification.open();
     }
     
-    private static VerticalLayout createDialogLayout() {
+    private static VerticalLayout createDialogLayout(Dialog dialog) throws Exception {
+        Connection con = GestionBDD.connectSurServeurM3();
 
-        TextField id = new TextField("id du type d'opération ");
-        TextField des = new TextField("id du produit ");
-
-        VerticalLayout dialogLayout = new VerticalLayout(id,
-                des);
+        IntegerField idtype = new IntegerField("id du type d'opération");
+        IntegerField idproduit = new IntegerField("id du produit");
+    
+        VerticalLayout dialogLayout = new VerticalLayout(idtype, idproduit);
         dialogLayout.setPadding(false);
         dialogLayout.setSpacing(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
 
-        return dialogLayout;
+        Button saveButton = new Button("Add");
+        dialog.getFooter().add(saveButton);
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addClickListener(e -> {
+            try {
+                createOperation(con, idtype.getValue(), idproduit.getValue());
+                dialog.close();
+            
+            } catch (SQLException ex) {
+                // Gérer l'exception, par exemple, afficher un message d'erreur
+                ex.printStackTrace();
+            }
+        });
+
+    
+
+    return dialogLayout;
     }
     
-    private static Button createSaveButton(Dialog dialog) {
-        Button saveButton = new Button("Add", e -> dialog.close());
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-        return saveButton;
-    }
 }
