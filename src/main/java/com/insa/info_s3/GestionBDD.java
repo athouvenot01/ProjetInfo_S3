@@ -306,16 +306,15 @@ public class GestionBDD {
     }
     
     //Ici c'est la création d'un opérateur
-    public static void createOperateur(Connection con, String prenom, String nom, int idmachine, int etatoperateur) throws SQLException {
-        String sql = "INSERT INTO operateur (prenom, nom, idmachine, etatoperateur) VALUES (?, ?, ?, ?)"; 
+    public static void createOperateur(Connection con, String prenom, String nom, int etatoperateur) throws SQLException {
+        String sql = "INSERT INTO operateur (prenom, nom, etatoperateur) VALUES (?, ?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setString(1, prenom);
             preparedStatement.setString(2, nom);
-            preparedStatement.setInt(3, idmachine);
-            preparedStatement.setInt(4, etatoperateur);
+            preparedStatement.setInt(3, etatoperateur);
 
             preparedStatement.executeUpdate();
-            System.out.println("Opérateur créée avec succès !");
+            System.out.println("Opérateur créé avec succès !");
         }
     }
     
@@ -329,6 +328,32 @@ public class GestionBDD {
                 System.out.println("Opérateur supprimé avec succès !");
             } else {
                 System.out.println("Aucun opérateur trouvé avec l'ID : " + operateurId);
+            }
+        }
+    }
+    
+    //Ici c'est la création du poste de travail
+    public static void createPosteTravail(Connection con, int idmachine, int idoperateur) throws SQLException {
+        String sql = "INSERT INTO postetravail (idmachine, idoperateur) VALUES (?, ?)"; 
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idmachine);
+            preparedStatement.setInt(2, idoperateur);
+
+            preparedStatement.executeUpdate();
+            System.out.println("Poste de Travail créé avec succès !");
+        }   
+    }
+    
+    //Ici suppresion d'un poste de travail 
+    public static void deletePosteTravail(Connection con, int posteTravailId) throws SQLException {
+        String sql = "DELETE FROM postetravail WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, posteTravailId);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Poste de Travail supprimé avec succès !");
+            } else {
+                System.out.println("Aucun pote de travail trouvé avec l'ID : " + posteTravailId);
             }
         }
     }
@@ -393,8 +418,14 @@ public class GestionBDD {
                     + "  id integer primary key auto_increment,\n"
                     + "  prenom text,\n"
                     + "  nom text,\n"
-                    + "  idmachine integer, \n"
-                    + "  etatoperateur int \n"
+                    + "  etatoperateur integer \n"
+                    + ")"
+            );
+            st.executeUpdate(
+                    "create table postetravail (\n"
+                    + "  id integer primary key auto_increment,\n"
+                    + "  idmachine integer,\n"
+                    + "  idoperateur integer \n"
                     + ")"
             );
             st.executeUpdate(
@@ -426,9 +457,13 @@ public class GestionBDD {
                     + "  add constraint fk_produit_idmateriaux \n"
                     + "  foreign key (idmateriaux) references materiaux(id)");
             st.executeUpdate(
-                    "alter table operateur \n"
-                    + "  add constraint fk_operateur_idmachine \n"
+                    "alter table postetravail \n"
+                    + "  add constraint fk_postetravail_idmachine \n"
                     + "  foreign key (idmachine) references machine(id)");
+            st.executeUpdate(
+                    "alter table postetravail \n"
+                    + "  add constraint fk_postetravail_idoperateur \n"
+                    + "  foreign key (idoperateur) references operateur(id)");
             conn.commit();
         } catch (SQLException ex) {
             conn.rollback();
@@ -445,7 +480,12 @@ public class GestionBDD {
             // puis les tables
             // suppression des liens
             try {
-                st.executeUpdate("alter table operateur drop constraint fk_operateur_idmachine");
+                st.executeUpdate("alter table postetravail drop constraint fk_postetravail_idoperateur");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the constraint was not created
+            }
+            try {
+                st.executeUpdate("alter table postetravail drop constraint fk_postetravail_idmachine");
             } catch (SQLException ex) {
                 // nothing to do : maybe the constraint was not created
             }
@@ -484,6 +524,10 @@ public class GestionBDD {
             } catch (SQLException ex) {
             }
             // je peux maintenant supprimer les tables
+            try {
+                st.executeUpdate("drop table postetravail");
+            } catch (SQLException ex) {
+            }
             try {
                 st.executeUpdate("drop table operateur");
             } catch (SQLException ex) {
@@ -604,11 +648,10 @@ public class GestionBDD {
                 if (bouts[0].equals("operateur")) { 
                     String prenom = bouts[1];
                     String nom = bouts[2];
-                    int idmachine = Integer.parseInt(bouts[3]);
-                    int etatoperateur = Integer.parseInt(bouts[4]);
+                    int etatoperateur = Integer.parseInt(bouts[3]);
                     
                     try {
-                        createOperateur(con, prenom, nom, idmachine, etatoperateur);
+                        createOperateur(con, prenom, nom, etatoperateur);
                     } catch (SQLException e) {
                         System.out.println("Erreur lors de la création de l'operateur");
                     }
