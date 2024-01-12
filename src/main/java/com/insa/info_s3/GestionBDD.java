@@ -874,6 +874,11 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             // puis les tables
             // suppression des liens
             try {
+                st.executeUpdate("alter table commande drop constraint fk_commande_idclient");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the constraint was not created
+            }
+            try {
                 st.executeUpdate("alter table achat drop constraint fk_achat_idcommande");
             } catch (SQLException ex) {
                 // nothing to do : maybe the constraint was not created
