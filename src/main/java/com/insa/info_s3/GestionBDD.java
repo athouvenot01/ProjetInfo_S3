@@ -241,12 +241,13 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
     }
     
     //Ici création d'un produit 
-    public static void createProduit(Connection con, String ref, String des, int idmateriaux) throws SQLException {
-        String sql = "INSERT INTO produit (ref, des, idmateriaux) VALUES (?, ?, ?)"; 
+    public static void createProduit(Connection con, String ref, String des, int idmateriaux, int poids) throws SQLException {
+        String sql = "INSERT INTO produit (ref, des, idmateriaux, poids) VALUES (?, ?, ?, ?)"; 
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setString(1, ref);
             preparedStatement.setString(2, des);
             preparedStatement.setInt(3, idmateriaux);
+            preparedStatement.setInt(4, poids);
             
             preparedStatement.executeUpdate();
             System.out.println("Produit créé avec succès !");
@@ -574,6 +575,120 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             }
         }
     }
+    
+    //Ici c'est la création du poste d'un achat
+    public static void createAchat(Connection con, int idproduit, int quantité, int idcommande) throws SQLException {
+        String sql = "INSERT INTO achat (idproduit, quantité, idcommande) VALUES (?, ?, ?)"; 
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idproduit);
+            preparedStatement.setInt(2, quantité);
+            preparedStatement.setInt(3, idcommande);
+
+            preparedStatement.executeUpdate();
+            System.out.println("Achat créé avec succès !");
+        }   
+    }
+    
+    //Ici suppresion d'un achat
+    public static void deleteAchat(Connection con, int achatId) throws SQLException {
+        String sql = "DELETE FROM achat WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, achatId);
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Achat supprimé avec succès !");
+            } else {
+                System.out.println("Aucun achat trouvé avec l'ID : " + achatId);
+            }
+        }
+    }
+    
+    //Ici c'est la création du poste d'une commande
+    public static void createCommande(Connection con, int idclient) throws SQLException {
+        String sql = "INSERT INTO commande (idclient) VALUES (?)"; 
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idclient);
+
+            preparedStatement.executeUpdate();
+            System.out.println("Commande créée avec succès !");
+        }   
+    }
+    
+    //Ici suppresion d'une commande
+    public static void deleteCommande(Connection con, int commandeId) throws SQLException {
+        String sql = "DELETE FROM commande WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, commandeId);
+            while (getIdByCommande(con, commandeId) != 0) {
+                deleteClient(con, getIdByClient(con, commandeId));
+            }
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Commande supprimée avec succès !");
+            } else {
+                System.out.println("Aucune commande trouvée avec l'ID : " + commandeId);
+            }
+        }
+    }
+    
+    public static int getIdByCommande(Connection con, int idCommande) throws SQLException {
+        int idAchat = 0;
+        String sql = "SELECT id FROM achat WHERE idcommande = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idCommande);                        
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    idAchat = resultSet.getInt("id");
+                }
+            }
+        }
+        return idAchat;
+    }
+    
+    //Ici c'est la création du poste d'une commande
+    public static void createClient(Connection con, String nom, String prenom) throws SQLException {
+        String sql = "INSERT INTO client (nom, prenom) VALUES (?, ?)"; 
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setString(1, nom);
+            preparedStatement.setString(2, prenom);
+
+            preparedStatement.executeUpdate();
+            System.out.println("Client créé avec succès !");
+        }   
+    }
+    
+    //Ici suppresion d'une commande
+    public static void deleteClient(Connection con, int clientId) throws SQLException {
+        String sql = "DELETE FROM client WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, clientId);
+            while (getIdByClient(con, clientId) != 0) {
+                deleteCommande(con, getIdByClient(con, clientId));
+            }
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount > 0) {
+                System.out.println("Client supprimé avec succès !");
+            } else {
+                System.out.println("Aucun client trouvé avec l'ID : " + clientId);
+            }
+        }
+    }
+    
+    public static int getIdByClient(Connection con, int idClient) throws SQLException {
+        int idCommande = 0;
+        String sql = "SELECT id FROM commande WHERE idclient = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idClient);                        
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    idCommande = resultSet.getInt("id");
+                }
+            }
+        }
+        return idCommande;
+    }
   
   
     public static void creeBase(Connection conn) throws SQLException {
@@ -594,7 +709,8 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
                     + "  id integer primary key auto_increment,\n"
                     + "  ref varchar(20),\n"
                     + "  des text, \n"
-                    + "  idmateriaux integer \n"
+                    + "  idmateriaux integer,\n"
+                    + "  poids integer \n"
                     + ")"
             );
             st.executeUpdate(
@@ -646,6 +762,27 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
                     + ")"
             );
             st.executeUpdate(
+                    "create table achat (\n"
+                    + "  id integer primary key auto_increment,\n"
+                    + "  idproduit integer,\n"
+                    + "  quantité integer,\n"
+                    + "  idcommande integer \n"
+                    + ")"
+            );
+            st.executeUpdate(
+                    "create table commande (\n"
+                    + "  id integer primary key auto_increment,\n"
+                    + "  idclient integer \n"
+                    + ")"
+            );
+            st.executeUpdate(
+                    "create table client (\n"
+                    + "  id integer primary key auto_increment,\n"
+                    + "  nom text,\n"
+                    + "  prenom text \n"
+                    + ")"
+            );
+            st.executeUpdate(
                     "alter table operation \n"
                     + "  add constraint fk_operation_idproduit \n"
                     + "  foreign key (idproduit) references produit(id)");
@@ -681,6 +818,14 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
                     "alter table postetravail \n"
                     + "  add constraint fk_postetravail_idoperateur \n"
                     + "  foreign key (idoperateur) references operateur(id)");
+            st.executeUpdate(
+                    "alter table achat \n"
+                    + "  add constraint fk_achat_idcommande \n"
+                    + "  foreign key (idcommande) references commande(id)");
+            st.executeUpdate(
+                    "alter table commande \n"
+                    + "  add constraint fk_commande_idclient \n"
+                    + "  foreign key (idclient) references client(id)");
             conn.commit();
         } catch (SQLException ex) {
             conn.rollback();
@@ -696,6 +841,11 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             // pour être sûr de pouvoir supprimer, il faut d'abord supprimer les liens
             // puis les tables
             // suppression des liens
+            try {
+                st.executeUpdate("alter table achat drop constraint fk_achat_idcommande");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the constraint was not created
+            }
             try {
                 st.executeUpdate("alter table postetravail drop constraint fk_postetravail_idoperateur");
             } catch (SQLException ex) {
@@ -741,6 +891,18 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             } catch (SQLException ex) {
             }
             // je peux maintenant supprimer les tables
+            try {
+                st.executeUpdate("drop table client");
+            } catch (SQLException ex) {
+            }
+            try {
+                st.executeUpdate("drop table commande");
+            } catch (SQLException ex) {
+            }
+            try {
+                st.executeUpdate("drop table achat");
+            } catch (SQLException ex) {
+            }
             try {
                 st.executeUpdate("drop table postetravail");
             } catch (SQLException ex) {
@@ -805,9 +967,10 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
                     String ref = bouts[1];
                     String des = bouts[2];
                     int idmateriaux = Integer.parseInt(bouts[3]);
+                    int poids = Integer.parseInt(bouts[3]);
                     
                     try {
-                        createProduit(con, ref, des, idmateriaux);
+                        createProduit(con, ref, des, idmateriaux, poids);
                     } catch (SQLException e) {
                         System.out.println("Erreur lors de la création du produit");
                     }
@@ -873,6 +1036,46 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
                         System.out.println("Erreur lors de la création de l'operateur");
                     }
                 } 
+                if (bouts[0].equals("postetravail")) { 
+                    int idoperateur = Integer.parseInt(bouts[1]);
+                    int idmachine = Integer.parseInt(bouts[2]);
+                    
+                    try {
+                        createPosteTravail(con, idoperateur, idmachine);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création du poste de travail");
+                    }
+                } 
+                if (bouts[0].equals("achat")) { 
+                    int idproduit = Integer.parseInt(bouts[1]);
+                    int quantité = Integer.parseInt(bouts[2]);
+                    int idcommande = Integer.parseInt(bouts[3]);
+                    
+                    try {
+                        createAchat(con, idproduit, quantité, idcommande);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création de l'achat");
+                    }
+                }
+                if (bouts[0].equals("commande")) { 
+                    int idclient = Integer.parseInt(bouts[1]);
+                    
+                    try {
+                        createCommande(con, idclient);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création de la commande");
+                    }
+                }
+                if (bouts[0].equals("client")) { 
+                    String prenom = bouts[1];
+                    String nom = bouts[2];
+                    
+                    try {
+                        createClient(con, prenom, nom);
+                    } catch (SQLException e) {
+                        System.out.println("Erreur lors de la création du client");
+                    }
+                }
             }
         }
     }
@@ -921,7 +1124,6 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             creeBase(con);
             //createMachine(con,"F04","rapide",30);
             lecture(con, new File("lecture.txt"));
-            deleteOperateur(con, 1);
         } catch (SQLException ex) {
             System.err.println("Code d'erreur SQL : " + ex.getErrorCode());
             System.err.println("Message d'erreur SQL : " + ex.getMessage());

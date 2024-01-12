@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 public class Interface_Console {
     
-    
+    /*
     public static void main(String[] args) {
         try (Connection con = GestionBDD.connectSurServeurM3()) {
             InterfaceC(con);  
@@ -106,5 +106,5 @@ public class Interface_Console {
                 }
             }
         
-    }
+    }*/
 }
