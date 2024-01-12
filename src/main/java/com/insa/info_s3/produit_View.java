@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -38,9 +39,9 @@ import java.util.List;
 @Route(value = "produit_View", layout = UI.class)
 public class produit_View extends Div {
     
-    public produit_View() {
+    public produit_View() throws SQLException {
         
-        try (Connection con = GestionBDD.connectSurServeurM3()){
+        Connection con = GestionBDD.connectSurServeurM3();
            
             H2 titre_View = new H2("Registre des produits");
             Button B1 = new Button ("Supprimer un produit",VaadinIcon.TRASH.create());
@@ -54,27 +55,7 @@ public class produit_View extends Div {
                 getUI().ifPresent(ui -> ui.navigate(""));
             });
             
-            B1.addClickListener(click -> {
-                TextField Nom1 = new TextField("entrez l'id du produit à supprimer");
-                Button valider = new Button ("entrer");
-                valider.addClickListener(enter -> {
-                    String valeurTextField = Nom1.getValue();
-                    try {
-                        // Convertir la valeur en int
-                        int valeurInt = Integer.parseInt(valeurTextField);
-                        deleteProduit(con, valeurInt);
-                        afficherNotification("le produit a bien été supprimé");
-                    }catch (NumberFormatException ex) {
-                        afficherNotification("Veuillez saisir un entier valide");
-                    } catch (SQLException ex) {
-                        Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    });
-                valider.addClickShortcut(Key.ENTER);
-                add(
-                    Nom1,
-                    valider);
-            });
+           
               
             B2.addClickListener(click -> {
                 
@@ -136,11 +117,24 @@ public class produit_View extends Div {
                 new HorizontalLayout(B1, B2, actualiser) 
                 );
             
-            
-        }catch (SQLException ex) {
-            System.out.println("probleme : " + ex.getLocalizedMessage());
-            ex.printStackTrace();
-        }
+             B1.addClickListener(click -> {
+                 Set<Produits> selectedItems = grid.getSelectedItems();
+    
+                if (selectedItems.isEmpty()) {
+                    Notification.show("Aucune ligne sélectionnée", 2000, Notification.Position.TOP_CENTER);
+                } else {
+        
+                    Produits selectedBean = selectedItems.iterator().next();
+                    int prop1Value = selectedBean.getId();
+                    try {GestionBDD.deleteProduit(con, prop1Value);}
+                    catch (SQLException ex) {
+                    // Gérer l'exception, par exemple, afficher un message d'erreur
+                        ex.printStackTrace();
+                    }
+                    
+                    Notification.show("Produit "+ selectedBean.getDes()+" supprimé avec succès : " , 5000, Notification.Position.TOP_CENTER);
+                }
+            });
     
     }
     
