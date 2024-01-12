@@ -13,10 +13,10 @@ public class Produit {
         private int id;
         private String ref;
         private String des;
-        private int materiaux;
+        private String materiaux;
         
 
-        public Produits (int id, String ref, String des, int materiaux) {
+        public Produits (int id, String ref, String des, String materiaux) {
             this.id = id;
             this.ref = ref;
             this.des = des;
@@ -46,13 +46,14 @@ public class Produit {
             this.ref = ref;
         }
 
-        public int getMateriaux() {
+        public String getMateriaux() {
             return materiaux;
         }
 
-        public void setMateriaux(int etatmachine) {
-            this.materiaux = etatmachine;
+        public void setMateriaux(String materiaux) {
+            this.materiaux = materiaux;
         }
-        
+
+       
     }
 }

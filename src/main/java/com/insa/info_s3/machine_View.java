@@ -4,6 +4,7 @@
  */
 package com.insa.info_s3;
 
+import static com.insa.info_s3.GestionBDD.createMachine;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
 import com.insa.info_s3.Machines.Machine;
 import com.vaadin.flow.component.Key;
@@ -18,6 +19,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import java.sql.Connection;
@@ -35,7 +37,7 @@ import java.util.logging.Logger;
 @Route(value = "machine_View", layout = UI.class)
 public class machine_View extends Div {
     
-    public machine_View(){
+    public machine_View() throws SQLException {
         try (Connection con = GestionBDD.connectSurServeurM3()){
             H2 titre_View = new H2("Registre des produits");
             Button B1 = new Button ("Supprimer une machine ",VaadinIcon.TRASH.create());
@@ -77,13 +79,19 @@ public class machine_View extends Div {
 
                 dialog.setHeaderTitle("Nouvelle machine");
 
-                VerticalLayout dialogLayout = createDialogLayout();
-                dialog.add(dialogLayout);
+                VerticalLayout dialogLayout;
+                try {
+                    dialogLayout = createDialogLayout();
+                    dialog.add(dialogLayout);
+                } catch (SQLException ex) {
+                    Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
 
-                Button saveButton = createSaveButton(dialog);
+                //Button saveButton = createSaveButton(dialog);
                 Button cancelButton = new Button("Cancel", e -> dialog.close());
                 dialog.getFooter().add(cancelButton);
-                dialog.getFooter().add(saveButton);
+                //dialog.getFooter().add(saveButton);
 
 
                 dialog.open();
@@ -105,13 +113,7 @@ public class machine_View extends Div {
                 grid,
                 new HorizontalLayout(B1, B2, actualiser) 
                 );
-            
-            
-        }catch (SQLException ex) {
-            System.out.println("probleme : " + ex.getLocalizedMessage());
-            ex.printStackTrace();
         }
-    
     }
 
     
@@ -127,28 +129,48 @@ public class machine_View extends Div {
         notification.open();
     }
     
-    private static VerticalLayout createDialogLayout() {
+    private static VerticalLayout createDialogLayout() throws SQLException {
+        
+        try (Connection con = GestionBDD.connectSurServeurM3()){
 
-        TextField id = new TextField("référence ");
-        TextField des = new TextField("description ");
-        TextField puissance = new TextField("puissance");
-        TextField etat_machine = new TextField("état de la machine ");
+            TextField id = new TextField("référence ");
+            TextField des = new TextField("description ");
+            NumberField puissance = new NumberField("puissance");
+            NumberField etat_machine = new NumberField("état de la machine ");
+            
+            int nombreInt = (int) puissance.getValue();
+           
 
-        VerticalLayout dialogLayout = new VerticalLayout(id,
+            VerticalLayout dialogLayout = new VerticalLayout(id,
                 des,puissance, etat_machine);
-        dialogLayout.setPadding(false);
-        dialogLayout.setSpacing(false);
-        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
-        dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+            dialogLayout.setPadding(false);
+            dialogLayout.setSpacing(false);
+            dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+            dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+        
+            Button saveButton = new Button("Add");
+            saveButton.addClickListener(e-> {
+                
+                createMachine(con,id.getValue(),des.getValue(), nombreInt, etat_machine.getValue());
+               
+            });
 
-        return dialogLayout;
+            return dialogLayout;
+            
+        }
+       
     }
     
-    private static Button createSaveButton(Dialog dialog) {
-        Button saveButton = new Button("Add", e -> dialog.close());
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-        return saveButton;
-    }
     
+    /*private static Button createSaveButton(Dialog dialog) {
+        try (Connection con = GestionBDD.connectSurServeurM3()){
+            Button saveButton = new Button("Add");
+            saveButton.addClickListener(click -> {
+            createMachine(con, id.getValue);
+            });
+            saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        
+        r   eturn saveButton;
+
+        }*/
 }
