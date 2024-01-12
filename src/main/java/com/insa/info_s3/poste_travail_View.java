@@ -4,7 +4,9 @@
  */
 package com.insa.info_s3;
 
+import static com.insa.info_s3.GestionBDD.createPosteTravail;
 import static com.insa.info_s3.GestionBDD.createMachine;
+import com.insa.info_s3.PosteDeTravail.PosteDeTravaille;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -33,14 +35,16 @@ import java.util.logging.Logger;
  * @author loicrosian
  */
 
-@Route(value = "machine_View", layout = UI.class)
-public class poste_travail extends Div {
+@Route(value = "posteTravail_View", layout = UI.class)
+public class poste_travail_View extends Div {
     
-    public poste_travail() throws SQLException {
+    private Grid<PosteDeTravail.PosteDeTravaille> grid = new Grid<>();
+    
+    public poste_travail_View() throws SQLException {
         try (Connection con = GestionBDD.connectSurServeurM3()){
             H2 titre_View = new H2("Registre des postes de travail");
-            Button B1 = new Button ("Supprimer une machine ",VaadinIcon.TRASH.create());
-            Button B2 = new Button ("Ajouter une machine",VaadinIcon.PLUS.create());
+            Button B1 = new Button ("Supprimer un poste de travail ",VaadinIcon.TRASH.create());
+            Button B2 = new Button ("Ajouter un poste de travail",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             
@@ -76,7 +80,7 @@ public class poste_travail extends Div {
                 
                 Dialog dialog = new Dialog();
 
-                dialog.setHeaderTitle("Nouvelle machine");
+                dialog.setHeaderTitle("Nouveau poste de travail");
 
                 VerticalLayout dialogLayout;
                 
@@ -105,14 +109,11 @@ public class poste_travail extends Div {
             });
             
             // Créer une grille avec les colonnes
-            List<Machines.Machine> Machines = GestionBDD.Getmachine(con);
-            Grid<Machines.Machine> grid = new Grid<>();
-            grid.addColumn(Machines.Machine::getId).setHeader("Id");
-            grid.addColumn(Machines.Machine::getRef).setHeader("ref");
-            grid.addColumn(Machines.Machine::getDes).setHeader("des");
-            grid.addColumn(Machines.Machine::getPuissance).setHeader("Puissance");
-            grid.addColumn(Machines.Machine::getEtatmachine).setHeader("Etat Machine");
-            grid.setItems(Machines);
+            List<PosteDeTravail.PosteDeTravaille> PosteDeTravail = GestionBDD.GetPostedeTravail(con);
+            grid.addColumn(PosteDeTravaille::getId).setHeader("id");
+            grid.addColumn(PosteDeTravaille::getIdoperateur).setHeader("id opérateur");
+            grid.addColumn(PosteDeTravaille::getIdmachine).setHeader("id machine");
+            grid.setItems(PosteDeTravail);
            
             add(
                 titre_View, 
@@ -140,29 +141,10 @@ public class poste_travail extends Div {
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
     Connection con = GestionBDD.connectSurServeurM3();
     
-    TextField id = new TextField("Référence");
-    TextField des = new TextField("Description");
+    IntegerField idmachine = new IntegerField("id de la machine");
+    IntegerField idoperateur = new IntegerField("id de l'opérateur");
     
-    IntegerField puissance = new IntegerField("Puissance");
-    Div WSufix = new Div();
-    WSufix.setText("Watt");
-    puissance.setSuffixComponent(WSufix);
-    
-    List<String> items = new ArrayList<>(
-            Arrays.asList("Inactif", "Actif"));
-    
-    ComboBox<String> comboBox = new ComboBox<>("Etat de la machine ");
-    comboBox.setAllowCustomValue(true);
-    comboBox.addCustomValueSetListener(e -> {
-        String customValue = e.getDetail();
-        items.add(customValue);
-        comboBox.setItems(items);
-        comboBox.setValue(customValue);
-        });
-    comboBox.setItems(items);
-    comboBox.setHelperText("sélectionner l'état de la machine");
-   
-    VerticalLayout dialogLayout = new VerticalLayout(id, des, puissance, comboBox);
+    VerticalLayout dialogLayout = new VerticalLayout(idmachine, idoperateur);
     dialogLayout.setPadding(false);
     dialogLayout.setSpacing(false);
     dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
@@ -173,10 +155,8 @@ public class poste_travail extends Div {
     saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     saveButton.addClickListener(e -> {
         try {
-            int state = getValueComboBox(comboBox);
-            createMachine(con, id.getValue(), des.getValue(), puissance.getValue(), state);
+            createPosteTravail(con, idmachine.getValue(), idoperateur.getValue());
             dialog.close();
-            
         } catch (SQLException ex) {
             // Gérer l'exception, par exemple, afficher un message d'erreur
             ex.printStackTrace();

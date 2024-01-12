@@ -46,6 +46,8 @@ import java.util.List;
 @Route(value = "matériau_View", layout = UI.class)
 public class materiaux_View extends Div {
     
+    private Grid<Materiaux.materiaux> grid = new Grid<>();
+    
     public materiaux_View() throws SQLException{
         try (Connection con = GestionBDD.connectSurServeurM3()){
             H2 titre_View = new H2("Registre des Matériaux");
@@ -116,7 +118,7 @@ public class materiaux_View extends Div {
             
             // Créer une grille avec les colonnes
             List<Materiaux.materiaux> Materiaux = GestionBDD.GetMateriaux(con);
-            Grid<Materiaux.materiaux> grid = new Grid<>();
+            
             grid.addColumn(materiaux::getId).setHeader("Id");
             grid.addColumn(materiaux::getDes).setHeader("des");
             grid.addColumn(materiaux::getPrix).setHeader("prix €");
