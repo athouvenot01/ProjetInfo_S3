@@ -6,17 +6,18 @@ package com.insa.info_s3;
 
 /**
  *
- * @author loicrosian
+ * @author Emilien
  */
-public class Operations {
-    public static class Operation {
+public class Materiaux {
+    public static class materiaux {
         private String des;
+        private int prix;
         private int id;
-        
-        public Operation (int id, String des) {
+    
+     public materiaux(int id,String des, int prix) {
             this.id = id;
             this.des = des;
-            
+            this.prix = prix;
         }
 
         public String getDes() {
@@ -27,6 +28,14 @@ public class Operations {
             this.des = des;
         }
 
+        public int getPrix() {
+            return prix;
+        }
+
+        public void setPrix(int prix) {
+            this.prix = prix;
+        }
+
         public int getId() {
             return id;
         }
@@ -34,6 +43,6 @@ public class Operations {
         public void setId(int id) {
             this.id = id;
         }
-
+    
     }
 }
