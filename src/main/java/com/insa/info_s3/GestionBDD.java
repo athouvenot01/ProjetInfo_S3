@@ -86,16 +86,33 @@ public class GestionBDD {
                         String des = resultSet.getString("des");
                         int materiaux = resultSet.getInt("idmateriaux");
                         
-                        Produits Produit = new Produits(id,ref,des,materiaux);
+        
+                        
+                        Produits Produit = new Produits(id,ref,des,getNomMateriauxById(con, materiaux));
                         Produits.add(Produit);
         }
   
     }
   }
   return Produits;
-  
   }
-  
+  public static String getNomMateriauxById(Connection con, int idMateriaux) throws SQLException {
+    String nomMateriaux = null;
+    String sql = "SELECT des FROM materiaux WHERE id = ?";
+
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setInt(1, idMateriaux);
+
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                nomMateriaux = resultSet.getString("des");
+            }
+        }
+    }
+
+    return nomMateriaux;
+}
+ 
   
   
 
