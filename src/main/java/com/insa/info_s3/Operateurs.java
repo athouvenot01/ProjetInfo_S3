@@ -12,14 +12,14 @@ public class Operateurs {
     public static class Operateur {
         private String prenom;
         private String nom;
-        private int idmachine;
-        private int idetatoperateur;
+        private int id;
+        private String etatOperateur;
         
-        public Operateur(int idmachine, String nom, String prenom, int idetatoperateur) {
+        public Operateur(int id, String nom, String prenom, String etatOperateur) {
             this.prenom = prenom;
             this.nom = nom;
-            this.idmachine = idmachine;
-            this.idetatoperateur = idetatoperateur;
+            this.id = id;
+            this.etatOperateur = etatOperateur;
         }
 
         public String getPrenom() {
@@ -30,14 +30,6 @@ public class Operateurs {
             return nom;
         }
 
-        public int getIdmachine() {
-            return idmachine;
-        }
-
-        public int getIdetatoperateur() {
-            return idetatoperateur;
-        }
-
         public void setPrenom(String prenom) {
             this.prenom = prenom;
         }
@@ -46,13 +38,22 @@ public class Operateurs {
             this.nom = nom;
         }
 
-        public void setIdmachine(int idmachine) {
-            this.idmachine = idmachine;
+        public String getEtatOperateur() {
+            return etatOperateur;
         }
 
-        public void setIdetatoperateur(int idetatoperateur) {
-            this.idetatoperateur = idetatoperateur;
+        public void setEtatOperateur(String etatOperateur) {
+            this.etatOperateur = etatOperateur;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
         }
         
+       
     }
 }

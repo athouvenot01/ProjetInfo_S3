@@ -104,8 +104,9 @@ public class GestionBDD {
             String nom = resultSet.getString("nom");
             int etatoperateur = resultSet.getInt("etatoperateur");
             
+            String statutOperateur = (etatoperateur == 1) ? "En poste" : "Au repos";
             
-            Operateur operateurs = new Operateur(id, prenom,nom,etatoperateur);
+            Operateur operateurs = new Operateur(id, prenom,nom,statutOperateur);
             operateur.add(operateurs);
         }
     }
@@ -122,8 +123,7 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             int id = resultSet.getInt("id");
             int idmachine = resultSet.getInt("idmachine");
             int idoperateur = resultSet.getInt("idoperateur");
-            
-            PosteDeTravaille poste = new PosteDeTravaille(id, idmachine, idoperateur);
+            PosteDeTravaille poste = new PosteDeTravaille(id, getRefMachinebyId(con, idmachine), getOperateurbyId(con, idoperateur));
             Poste.add(poste);
         }
     }
@@ -188,6 +188,38 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             }
         }
         return nomMateriaux;
+    }
+    
+     public static String getRefMachinebyId(Connection con, int idMachine) throws SQLException {
+        String RefMachine = null;
+        String sql = "SELECT ref FROM machine WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idMachine);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    RefMachine = resultSet.getString("ref");
+                }
+            }
+        }
+        return RefMachine;
+    }
+     
+     public static String getOperateurbyId(Connection con, int idOpe) throws SQLException {
+        String nomPrenomOperateur = null;
+        String sql = "SELECT nom,prenom FROM operateur WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idOpe);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                String nom = resultSet.getString("nom");
+                String prenom = resultSet.getString("prenom");
+                nomPrenomOperateur = nom + " " + prenom;
+                }
+            }
+        }
+        return nomPrenomOperateur;
     }
  
 

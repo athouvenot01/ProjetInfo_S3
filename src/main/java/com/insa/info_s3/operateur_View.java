@@ -125,11 +125,10 @@ public class operateur_View extends Div {
             
             // Données pour la grille (liste de listes)
            List<Operateur> Operateurs = GestionBDD.GetOperateur(con);
-            
+            grid.addColumn(Operateur::getId).setHeader("IdOperateur");
             grid.addColumn(Operateur::getPrenom).setHeader("Prenom");
             grid.addColumn(Operateur::getNom).setHeader("Nom");
-            grid.addColumn(Operateur::getIdmachine).setHeader("Machine");
-            grid.addColumn(Operateur::getIdetatoperateur).setHeader("Etat");
+            grid.addColumn(Operateur::getEtatOperateur).setHeader("Etat");
             grid.setItems(Operateurs);    
 
             add(
