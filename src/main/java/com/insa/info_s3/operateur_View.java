@@ -105,14 +105,14 @@ public class operateur_View extends Div {
                 
             });
             
-            // Créer une grille avec les colonnes
-            List<Operateurs.Operateur> Operateurs = GestionBDD.GetOperateur(con);
+            // Données pour la grille (liste de listes)
+           List<Operateur> Operateurs = GestionBDD.GetOperateur(con);
+            grid.addColumn(Operateur::getId).setHeader("IdOperateur");
             grid.addColumn(Operateur::getPrenom).setHeader("Prenom");
             grid.addColumn(Operateur::getNom).setHeader("Nom");
-            grid.addColumn(Operateur::getIdmachine).setHeader("id machine");
-            grid.addColumn(Operateur::getIdetatoperateur).setHeader("id de l'état de l'opérateur");
-            grid.setItems(Operateurs);
-           
+            grid.addColumn(Operateur::getEtatOperateur).setHeader("Etat");
+            grid.setItems(Operateurs);    
+
             add(
                 titre_View, 
                 new VerticalLayout(grid),

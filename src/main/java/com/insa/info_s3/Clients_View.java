@@ -4,6 +4,7 @@
  */
 package com.insa.info_s3;
 
+import com.insa.info_s3.Clients.client;
 import static com.insa.info_s3.GestionBDD.createClient;
 import static com.insa.info_s3.GestionBDD.createMachine;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
@@ -45,11 +46,13 @@ import java.util.List;
 @Route(value = "clients_View", layout = UI.class)
 public class Clients_View extends Div{
     
+    private Grid<Clients.client> grid = new Grid<>();
+    
     public Clients_View() throws SQLException{
         try (Connection con = GestionBDD.connectSurServeurM3()){
             H2 titre_View = new H2("Registre des clients");
-            Button B1 = new Button ("Supprimer un clients ",VaadinIcon.TRASH.create());
-            Button B2 = new Button ("Ajouter un clients",VaadinIcon.PLUS.create());
+            Button B1 = new Button ("Supprimer un client ",VaadinIcon.TRASH.create());
+            Button B2 = new Button ("Ajouter un client",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             
@@ -107,14 +110,11 @@ public class Clients_View extends Div{
             });
             
             // Créer une grille avec les colonnes
-            List<Machine> Machines = GestionBDD.Getmachine(con);
-            Grid<Machine> grid = new Grid<>();
-            grid.addColumn(Machine::getId).setHeader("Id");
-            grid.addColumn(Machine::getRef).setHeader("ref");
-            grid.addColumn(Machine::getDes).setHeader("des");
-            grid.addColumn(Machine::getPuissance).setHeader("Puissance");
-            grid.addColumn(Machine::getEtatmachine).setHeader("Etat Machine");
-            grid.setItems(Machines);
+            List<Clients> Clients = GestionBDD.GetClients(con);
+            grid.addColumn(client::getId).setHeader("Id");
+            grid.addColumn(client::getPrenom).setHeader("Prenom");
+            grid.addColumn(client::getNom).setHeader("Nom");
+            //grid.setItems(Clients);
            
             add(
                 titre_View, 

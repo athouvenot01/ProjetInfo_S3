@@ -111,8 +111,8 @@ public class poste_travail_View extends Div {
             // Créer une grille avec les colonnes
             List<PosteDeTravail.PosteDeTravaille> PosteDeTravail = GestionBDD.GetPostedeTravail(con);
             grid.addColumn(PosteDeTravaille::getId).setHeader("id");
-            grid.addColumn(PosteDeTravaille::getIdoperateur).setHeader("id opérateur");
-            grid.addColumn(PosteDeTravaille::getIdmachine).setHeader("id machine");
+            grid.addColumn(PosteDeTravaille::getNomOpe).setHeader("Opérateur");
+            grid.addColumn(PosteDeTravaille::getRefMachine).setHeader("Ref de la machine");
             grid.setItems(PosteDeTravail);
            
             add(

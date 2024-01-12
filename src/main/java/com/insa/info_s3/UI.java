@@ -139,6 +139,8 @@ public class UI extends AppLayout implements RouterLayout{
                         //VaadinIcon.DASHBOARD.create()),
                 new SideNavItem("Orders", "/orders", VaadinIcon.CART.create()),
                 
+                new SideNavItem("Clients", "/clients_View", 
+                        VaadinIcon.USERS.create()),
                 new SideNavItem("Machine", "/machine_View",
                         VaadinIcon.COGS.create()),
                 new SideNavItem("Produit", "/produit_View",

@@ -10,31 +10,31 @@ package com.insa.info_s3;
  */
 public class PosteDeTravail {
     public static class PosteDeTravaille {
-        private int idmachine;
-        private int idoperateur;
+        private String refMachine;
+        private String NomOpe;
         private int id;
         
-        public PosteDeTravaille (int id, int idmachine,int idoperateur) {
+        public PosteDeTravaille (int id, String refMachine,String NomOpe) {
             this.id = id;
-            this.idmachine = idmachine;
-            this.idoperateur=idoperateur;
+            this.refMachine = refMachine;
+            this.NomOpe=NomOpe;
             
         }
 
-        public int getIdmachine() {
-            return idmachine;
+        public String getRefMachine() {
+            return refMachine;
         }
 
-        public void setIdmachine(int idmachine) {
-            this.idmachine = idmachine;
+        public void setRefMachine(String refMachine) {
+            this.refMachine = refMachine;
         }
 
-        public int getIdoperateur() {
-            return idoperateur;
+        public String getNomOpe() {
+            return NomOpe;
         }
 
-        public void setIdoperateur(int idoperateur) {
-            this.idoperateur = idoperateur;
+        public void setNomOpe(String NomOpe) {
+            this.NomOpe = NomOpe;
         }
 
         public int getId() {
@@ -44,6 +44,8 @@ public class PosteDeTravail {
         public void setId(int id) {
             this.id = id;
         }
+
+        
         
     }
 }
