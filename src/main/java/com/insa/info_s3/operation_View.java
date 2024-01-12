@@ -8,6 +8,7 @@ import static com.insa.info_s3.GestionBDD.createOperation;
 import static com.insa.info_s3.GestionBDD.createProduit;
 import static com.insa.info_s3.GestionBDD.deleteOperation;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
+import com.insa.info_s3.Operations.Operation;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -36,9 +37,8 @@ import java.util.logging.Logger;
 
 @Route(value = "operation_View", layout = UI.class)
 public class operation_View extends Div {
-    
+    private Grid<Operation> grid = new Grid<>();
     public operation_View() {
-        
         try (Connection con = GestionBDD.connectSurServeurM3()){
            
             H2 titre_View = new H2("Registre des opérations");
@@ -119,23 +119,10 @@ public class operation_View extends Div {
             
          
             // Données pour la grille (liste de listes)
-            List<List<String>> donnees = Arrays.asList(
-                Arrays.asList("A1", "B1", "C1"),
-                Arrays.asList("A2", "B2", "C2"),
-                Arrays.asList("A3", "B3", "C3")
-            );
-
-            // Créer une grille avec les colonnes
-            Grid<List<String>> grid = new Grid<>();
-            grid.setItems(donnees);
-
-            // Ajouter des colonnes à la grille
-            for (int i = 0; i < donnees.get(0).size(); i++) {
-                int indiceColonne = i;
-                grid.addColumn(item -> item.get(indiceColonne)).setHeader("Colonne " + (indiceColonne + 1));
-            }
-
-            
+            List<Operation> Operations = GestionBDD.GetOperation(con);
+            grid.addColumn(Operation::getId).setHeader("Id");
+            grid.addColumn(Operation::getDes).setHeader("des");
+            grid.setItems(Operations);            
             
             add(
                 titre_View, 

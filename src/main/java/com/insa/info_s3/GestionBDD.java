@@ -76,7 +76,7 @@ public class GestionBDD {
 }
       public static List<Operation> GetOperation(Connection con) throws SQLException {
     List<Operation> operation = new ArrayList<>();
-    String sql = "SELECT * FROM materiaux";
+    String sql = "SELECT * FROM typeoperation";
     
     try (PreparedStatement preparedStatement = con.prepareStatement(sql);
          ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -102,7 +102,7 @@ public class GestionBDD {
             int id = resultSet.getInt("id");
             String prenom = resultSet.getString("prenom");
             String nom = resultSet.getString("nom");
-            int etatoperateur = resultSet.getInt("idoperateur");
+            int etatoperateur = resultSet.getInt("etatoperateur");
             
             
             Operateur operateurs = new Operateur(id, prenom,nom,etatoperateur);
@@ -113,7 +113,7 @@ public class GestionBDD {
 }
 public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQLException {
     List<PosteDeTravaille> Poste = new ArrayList<>();
-    String sql = "SELECT * FROM postedetravail";
+    String sql = "SELECT * FROM postetravail";
     
     try (PreparedStatement preparedStatement = con.prepareStatement(sql);
          ResultSet resultSet = preparedStatement.executeQuery()) {

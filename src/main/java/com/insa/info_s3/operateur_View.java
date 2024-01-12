@@ -7,6 +7,7 @@ package com.insa.info_s3;
 import static com.insa.info_s3.GestionBDD.createOperateur;
 import static com.insa.info_s3.GestionBDD.createProduit;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
+import com.insa.info_s3.Operateurs.Operateur;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -36,7 +37,7 @@ import java.util.List;
 
 @Route(value = "operateur_View", layout = UI.class)
 public class operateur_View extends Div {
-
+    private Grid<Operateur> grid = new Grid<>();
     public operateur_View() throws SQLException{
        
         try (Connection con = GestionBDD.connectSurServeurM3()){
@@ -123,22 +124,14 @@ public class operateur_View extends Div {
             });
             
             // Données pour la grille (liste de listes)
-            List<List<String>> donnees = Arrays.asList(
-                Arrays.asList("A1", "B1", "C1"),
-                Arrays.asList("A2", "B2", "C2"),
-                Arrays.asList("A3", "B3", "C3")
-            );
-
-            // Créer une grille avec les colonnes
-            Grid<List<String>> grid = new Grid<>();
-            grid.setItems(donnees);
-
-            // Ajouter des colonnes à la grille
-            for (int i = 0; i < donnees.get(0).size(); i++) {
-                int indiceColonne = i;
-                grid.addColumn(item -> item.get(indiceColonne)).setHeader("Colonne " + (indiceColonne + 1));
-            }
+           List<Operateur> Operateurs = GestionBDD.GetOperateur(con);
             
+            grid.addColumn(Operateur::getPrenom).setHeader("Prenom");
+            grid.addColumn(Operateur::getNom).setHeader("Nom");
+            grid.addColumn(Operateur::getIdmachine).setHeader("Machine");
+            grid.addColumn(Operateur::getIdetatoperateur).setHeader("Etat");
+            grid.setItems(Operateurs);    
+
             add(
                 titre_View, 
                 new VerticalLayout(grid),

@@ -118,12 +118,11 @@ public class materiaux_View extends Div {
             
             // Créer une grille avec les colonnes
             List<Materiaux.materiaux> Materiaux = GestionBDD.GetMateriaux(con);
-            
             grid.addColumn(materiaux::getId).setHeader("Id");
             grid.addColumn(materiaux::getDes).setHeader("des");
             grid.addColumn(materiaux::getPrix).setHeader("prix €");
-            
             grid.setItems(Materiaux);
+            
             add(
                 titre_View, 
                 grid,
