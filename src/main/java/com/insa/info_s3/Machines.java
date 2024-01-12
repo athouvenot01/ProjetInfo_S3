@@ -14,9 +14,9 @@ public class Machines {
         private String des;
         private int puissance;
         private int id;
-        private int etatmachine;
+        private String etatmachine;
 
-        public Machine(int id, String ref, String des, int puissance , int etatmachine) {
+        public Machine(int id, String ref, String des, int puissance , String etatmachine) {
             this.id = id;
             this.ref = ref;
             this.des = des;
@@ -56,15 +56,16 @@ public class Machines {
             this.puissance = puissance;
         }
 
-       
-
-        public int getEtatmachine() {
+        public String getEtatmachine() {
             return etatmachine;
         }
 
-        public void setEtatmachine(int etatmachine) {
+        public void setEtatmachine(String etatmachine) {
             this.etatmachine = etatmachine;
         }
+
+       
+
         
     }
 }

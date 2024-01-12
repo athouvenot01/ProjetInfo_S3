@@ -81,7 +81,7 @@ public class machine_View extends Div {
 
                 VerticalLayout dialogLayout;
                 try {
-                    dialogLayout = createDialogLayout();
+                    dialogLayout = createDialogLayout(dialog);
                     dialog.add(dialogLayout);
                 } catch (SQLException ex) {
                     Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
@@ -105,7 +105,6 @@ public class machine_View extends Div {
             grid.addColumn(Machine::getDes).setHeader("des");
             grid.addColumn(Machine::getPuissance).setHeader("Puissance");
             grid.addColumn(Machine::getEtatmachine).setHeader("Etat Machine");
-            
             grid.setItems(Machines);
            
             add(
@@ -129,37 +128,43 @@ public class machine_View extends Div {
         notification.open();
     }
     
-    private static VerticalLayout createDialogLayout() throws SQLException {
-        
-        try (Connection con = GestionBDD.connectSurServeurM3()){
+    private static VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
+    Connection con = GestionBDD.connectSurServeurM3();
 
-            TextField id = new TextField("référence ");
-            TextField des = new TextField("description ");
-            NumberField puissance = new NumberField("puissance");
-            NumberField etat_machine = new NumberField("état de la machine ");
+    TextField id = new TextField("Référence");
+    TextField des = new TextField("Description");
+    NumberField puissance = new NumberField("Puissance");
+    NumberField etat_machine = new NumberField("État de la machine");
+
+    VerticalLayout dialogLayout = new VerticalLayout(id, des, puissance, etat_machine);
+    dialogLayout.setPadding(false);
+    dialogLayout.setSpacing(false);
+    dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+    dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+
+    Button saveButton = new Button("Ajouter");
+    saveButton.addClickListener(e -> {
+        try {
+            int puissanceInt = puissance.getValue().intValue();
+            int etat_machineInt = etat_machine.getValue().intValue();
+            createMachine(con, id.getValue(), des.getValue(), puissanceInt, etat_machineInt);
+            dialog.close();
             
-            int nombreInt = (int) puissance.getValue();
-           
-
-            VerticalLayout dialogLayout = new VerticalLayout(id,
-                des,puissance, etat_machine);
-            dialogLayout.setPadding(false);
-            dialogLayout.setSpacing(false);
-            dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
-            dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
-        
-            Button saveButton = new Button("Add");
-            saveButton.addClickListener(e-> {
-                
-                createMachine(con,id.getValue(),des.getValue(), nombreInt, etat_machine.getValue());
-               
-            });
-
-            return dialogLayout;
-            
+        } catch (SQLException ex) {
+            // Gérer l'exception, par exemple, afficher un message d'erreur
+            ex.printStackTrace();
         }
-       
-    }
+    });
+
+    // Ajoutez le bouton saveButton à dialogLayout si nécessaire
+    dialogLayout.add(saveButton);
+
+    return dialogLayout;
+}
+
+
+}
+
     
     
     /*private static Button createSaveButton(Dialog dialog) {
@@ -173,4 +178,3 @@ public class machine_View extends Div {
         r   eturn saveButton;
 
         }*/
-}
