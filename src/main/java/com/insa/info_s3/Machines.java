@@ -9,7 +9,9 @@ package com.insa.info_s3;
  * @author Emilien
  */
 public class Machines {
+    
     public static class Machine {
+        
         private String ref;
         private String des;
         private int puissance;
@@ -23,6 +25,7 @@ public class Machines {
             this.puissance = puissance;
             this.etatmachine =etatmachine;
         }
+        
         public String getDes() {
             return des;
         }
@@ -47,8 +50,6 @@ public class Machines {
             this.ref = ref;
         }
 
-        
-
         public int getPuissance() {
             return puissance;
         }
@@ -64,9 +65,5 @@ public class Machines {
         public void setEtatmachine(String etatmachine) {
             this.etatmachine = etatmachine;
         }
-
-       
-
-        
     }
 }
