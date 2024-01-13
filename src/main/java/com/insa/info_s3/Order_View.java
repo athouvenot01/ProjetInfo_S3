@@ -49,8 +49,6 @@ public class Order_View extends VerticalLayout {
         ex.printStackTrace();
     }
 });
-
-
         // Ajouter des composants à la mise en page
         add(
                 clientComboBox,
