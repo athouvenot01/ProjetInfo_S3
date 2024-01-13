@@ -12,10 +12,12 @@ public class Commande {
     public static class commande {
     private int id ;
     private int idClient;
+    private double montant;
     
-    public commande (int id , int idClient){
+    public commande (int id , int idClient,double montant){
     this.id=id;
     this.idClient=idClient;
+    this.montant=montant;
     }
 
         public int getId() {
@@ -32,6 +34,14 @@ public class Commande {
 
         public void setIdClient(int idClient) {
             this.idClient = idClient;
+        }
+
+        public double getMontant() {
+            return montant;
+        }
+
+        public void setMontant(double montant) {
+            this.montant = montant;
         }
     
     

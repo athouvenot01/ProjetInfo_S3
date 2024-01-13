@@ -16,7 +16,7 @@ public class Produit {
         private String materiaux;
         private double poids;
 
-        public Produits (int id, String ref, String des, String materiaux,double poids) {
+        public Produits (int id, String ref, String des, String materiaux ,double poids) {
             this.id = id;
             this.ref = ref;
             this.des = des;

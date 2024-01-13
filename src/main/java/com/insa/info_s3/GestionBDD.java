@@ -5,6 +5,7 @@
 package com.insa.info_s3;
 
 import com.insa.info_s3.Clients.Client;
+import com.insa.info_s3.Commande.commande;
 import com.insa.info_s3.Machines.Machine;
 import com.insa.info_s3.Materiaux.materiaux;
 import com.insa.info_s3.Operateurs.Operateur;
@@ -57,6 +58,73 @@ public class GestionBDD {
                 "30ea71e6");
     }
     
+    
+    public static double PrixAchat(Connection con, int idProduit, int quantité) {
+    double Prix = 0;
+    int PrixMater = 0;
+    double Duree = 0; // Utilisation d'un type primitif
+
+    String sql = "SELECT * FROM produit WHERE id=?";
+
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setInt(1, idProduit);
+
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                double Poids = resultSet.getDouble("poids");
+                PrixMater = getPrixbyID(con, resultSet.getInt("idmateriaux"));
+                Prix = Prix + Poids * PrixMater;
+
+                Duree = GetDuree(con, idProduit);
+                if (!Double.isNaN(Duree)) {
+                    Prix = Prix + Duree * 0.20;
+                }
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace(); // Gérez l'exception de manière appropriée dans votre application
+    }
+    Prix = Prix *quantité;
+    return Prix;
+}
+
+
+    
+    public static Double GetDuree (Connection con,int idProduit) throws SQLException{
+    double Duree = 0;
+    String sql ="SELECT idtype FROM operation WHERE id = ?";
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+                preparedStatement.setInt(1, idProduit);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                 while (resultSet.next()) {
+                 Duree=Duree + GetDureeOpe(con,resultSet.getInt("idtypes"));
+                 }
+            }
+    
+    
+    return Duree;}
+    }
+    public static Double GetDureeOpe(Connection con, int idtype) throws SQLException {
+    Double duree = null;
+    String sql = "SELECT AVG(duree) as duree_totale FROM realise WHERE idType=?";
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setInt(1, idtype);
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                duree = resultSet.getDouble("duree_totale");
+                if (resultSet.wasNull()) {
+                    duree = null; // La valeur était NULL dans la base de données
+                }
+            }
+        }
+    }
+    return duree;
+}
+
+    
+    
+    
+    
     public static List<Client> GetClients (Connection con) throws SQLException{
         List<Client> Clients  = new ArrayList <>();
         String sql = "SELECT * FROM client";
@@ -92,6 +160,40 @@ public class GestionBDD {
     }
     return Materiaux;
 }
+   public static List<commande> GetCommande(Connection con, int idclient) throws SQLException {
+    List<commande> commandes = new ArrayList<>();
+    String sql = "SELECT id FROM commande WHERE idclient=?";
+    
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setInt(1, idclient);
+        
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                int idCommande = resultSet.getInt("id");
+                
+                commande Commande = new commande(idCommande, idclient,MontantCommande(con, idCommande));
+                commandes.add(Commande);
+            }
+        }
+    }
+    return commandes;
+}
+    public static double MontantCommande (Connection con,int idCommande) throws SQLException{
+    double montant=0;
+    String sql = "SELECT * FROM achat WHERE id=?";
+    
+     try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+                preparedStatement.setInt(1, idCommande);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                montant = montant +PrixAchat(con, resultSet.getInt("idproduit"), resultSet.getInt("quantité"));
+                }
+            }
+     }
+    return montant;
+    }
+   
+
       public static List<Operation> GetOperation(Connection con) throws SQLException {
     List<Operation> operation = new ArrayList<>();
     String sql = "SELECT * FROM typeoperation";
@@ -207,6 +309,20 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             }
         }
         return nomMateriaux;
+    }
+     public static int getPrixbyID(Connection con, int idMateriaux) throws SQLException {
+        int prixmateriaux = 0;
+        String sql = "SELECT prix FROM materiaux WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idMateriaux);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    prixmateriaux = resultSet.getInt("prix");
+                }
+            }
+        }
+        return prixmateriaux;
     }
     
      public static String getRefMachinebyId(Connection con, int idMachine) throws SQLException {

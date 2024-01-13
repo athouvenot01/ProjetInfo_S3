@@ -4,6 +4,9 @@
  */
 package com.insa.info_s3;
 
+import com.insa.info_s3.Clients.Client;
+import com.insa.info_s3.Commande.commande;
+import static com.insa.info_s3.GestionBDD.*;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
@@ -20,24 +23,40 @@ import java.util.List;
  */
 @Route(value = "Order_View", layout = UI.class)
 public class Order_View extends VerticalLayout {
-    private Grid<Commande> grid = new Grid<>();
+    private Grid<commande> grid = new Grid<>();
     public Order_View () throws SQLException{
-        try (Connection con = GestionBDD.connectSurServeurM3()){
-             ComboBox<String> clientComboBox = new ComboBox<>("Choisir un client");
-             List<String> clients = Arrays.asList("Client 1", "Client 2", "Client 3");
+    Connection con = GestionBDD.connectSurServeurM3();
+            
+             ComboBox<Client> clientComboBox = new ComboBox<>("Choisir un client");
+             List<Client> clients = GetClients(con);
              clientComboBox.setItems(clients);
+             clientComboBox.setItemLabelGenerator(Client::toString);
 
         // Ajouter un événement de sélection de combobox
        clientComboBox.addValueChangeListener(event -> {
-            String selectedClient = event.getValue();
-            Notification.show("Client sélectionné : " + selectedClient);
-        });
+    Client selectedClient = event.getValue();
+    Notification.show("Client sélectionné : " + selectedClient.getNom());
+
+    try {
+        List<commande> commandes = GetCommande(con, selectedClient.getId());
+        grid.removeAllColumns(); // Supprime toutes les colonnes existantes
+        grid.addColumn(commande::getId).setHeader("Id");
+        grid.addColumn(commande::getMontant).setHeader("Montant");
+        grid.setItems(commandes);
+
+        grid.setVisible(true);
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+    }
+});
+
 
         // Ajouter des composants à la mise en page
         add(
-                clientComboBox
+                clientComboBox,
+                grid
         );
-    }
+    
         
         }
         
