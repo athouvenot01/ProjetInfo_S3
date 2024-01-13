@@ -787,7 +787,7 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, commandeId);
             while (getIdByCommande(con, commandeId) != 0) {
-                deleteClient(con, getIdByClient(con, commandeId));
+                deleteAchat(con, getIdByCommande(con, commandeId));
             }
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {
@@ -1296,6 +1296,7 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             creeBase(con);
             //createMachine(con,"F04","rapide",30);
             lecture(con, new File("lecture.txt"));
+            deleteClient(con, 1);
         } catch (SQLException ex) {
             System.err.println("Code d'erreur SQL : " + ex.getErrorCode());
             System.err.println("Message d'erreur SQL : " + ex.getMessage());
