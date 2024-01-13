@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -49,7 +50,9 @@ public class materiaux_View extends Div {
     private Grid<Materiaux.materiaux> grid = new Grid<>();
     
     public materiaux_View() throws SQLException{
-        try (Connection con = GestionBDD.connectSurServeurM3()){
+        
+        Connection con = GestionBDD.connectSurServeurM3();
+                
             H2 titre_View = new H2("Registre des Matériaux");
             Button B1 = new Button ("Supprimer un matériau",VaadinIcon.TRASH.create());
             Button B2 = new Button ("Ajouter un matériau",VaadinIcon.PLUS.create());
@@ -63,6 +66,22 @@ public class materiaux_View extends Div {
             });
             
             B1.addClickListener(click -> {
+                Set<materiaux> selectedItems = grid.getSelectedItems();
+                
+                if(selectedItems.isEmpty()) {
+                    Notification.show("Aucune ligne selectionnée");
+                
+                } else {
+                    materiaux selectedBean = selectedItems.iterator().next();
+                    int value = selectedBean.getId();
+                    try {GestionBDD.deleteMateriaux(con, value);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateMateriaux(con);} catch (SQLException ex){ex.printStackTrace();}
+                    
+                    Notification.show("Machine "+ selectedBean.getDes()+" supprimée avec succès" , 5000, Notification.Position.TOP_CENTER);
+                }
+            });
+            
+            /*B1.addClickListener(click -> {
                 /*TextField Nom1 = new TextField("id de la machine");
                 Button valider = new Button ("entrer");
                 valider.addClickListener(enter -> {
@@ -81,8 +100,8 @@ public class materiaux_View extends Div {
                 valider.addClickShortcut(Key.ENTER);
                 add(
                     Nom1,
-                    valider);*/
-            });
+                    valider);*//*
+            });*/
               
             B2.addClickListener(click -> {
                 
@@ -128,7 +147,7 @@ public class materiaux_View extends Div {
                 grid,
                 new HorizontalLayout(B1, B2, actualiser) 
                 );
-        }
+        
     }
 
     
@@ -171,6 +190,7 @@ public class materiaux_View extends Div {
         try {
             createMateriaux(con, des.getValue(), prix.getValue());
             dialog.close();
+            try {UpdateMateriaux(con);} catch (SQLException ex){ex.printStackTrace();}
             
         } catch (SQLException ex) {
             // Gérer l'exception, par exemple, afficher un message d'erreur
@@ -180,6 +200,12 @@ public class materiaux_View extends Div {
     });
     return dialogLayout;
 }
+
+
+    private void UpdateMateriaux (Connection con) throws SQLException{
+        List<materiaux> Materiaux = GestionBDD.GetMateriaux(con);
+        grid.setItems(Materiaux);
+    }
 
 }
     
