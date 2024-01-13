@@ -97,7 +97,7 @@ public class GestionBDD {
                 preparedStatement.setInt(1, idProduit);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                  while (resultSet.next()) {
-                 Duree=Duree + GetDureeOpe(con,resultSet.getInt("idtypes"));
+                 Duree=Duree + GetDureeOpe(con,resultSet.getInt("idtype"));
                  }
             }
     
