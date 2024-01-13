@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -49,7 +50,9 @@ public class Clients_View extends Div{
     private Grid<Client> grid = new Grid<>();
     
     public Clients_View() throws SQLException{
-        try (Connection con = GestionBDD.connectSurServeurM3()){
+        
+        Connection con = GestionBDD.connectSurServeurM3();
+        
             H2 titre_View = new H2("Registre des clients");
             Button B1 = new Button ("Supprimer un client ",VaadinIcon.TRASH.create());
             Button B2 = new Button ("Ajouter un client",VaadinIcon.PLUS.create());
@@ -62,27 +65,23 @@ public class Clients_View extends Div{
                 //getUI().ifPresent(ui -> ui.navigate(""));
             });
             
+            
             B1.addClickListener(click -> {
-                /*TextField Nom1 = new TextField("id de la machine");
-                Button valider = new Button ("entrer");
-                valider.addClickListener(enter -> {
-                    String valeurTextField = Nom1.getValue();
-                    try {
-                        // Convertir la valeur en int
-                        int valeurInt = Integer.parseInt(valeurTextField);
-                        deleteProduit(con, valeurInt);
-                        afficherNotification("le produit a bien été supprimé");
-                    }catch (NumberFormatException ex) {
-                        afficherNotification("Veuillez saisir un entier valide");
-                    } catch (SQLException ex) {
-                        Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    });
-                valider.addClickShortcut(Key.ENTER);
-                add(
-                    Nom1,
-                    valider);*/
+                Set<Client> selectedItems = grid.getSelectedItems();
+                
+                if(selectedItems.isEmpty()) {
+                    Notification.show("Aucune ligne selectionnée");
+                
+                } else {
+                    Client selectedBean = selectedItems.iterator().next();
+                    int value = selectedBean.getId();
+                    try {GestionBDD.deleteClient(con, value);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateClients(con);} catch (SQLException ex){ex.printStackTrace();}
+                    
+                    Notification.show("Client "+ selectedBean.getPrenom()+" "+selectedBean.getNom()+" supprimé avec succès" , 5000, Notification.Position.TOP_CENTER);
+                }
             });
+            
               
             B2.addClickListener(click -> {
                 
@@ -121,7 +120,7 @@ public class Clients_View extends Div{
                 grid,
                 new HorizontalLayout(B1, B2, actualiser) 
                 );
-        }
+        
     }
     
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
@@ -145,6 +144,7 @@ public class Clients_View extends Div{
         try {
             createClient(con,nom.getValue(), prenom.getValue());
             dialog.close();
+            try {UpdateClients(con);} catch (SQLException ex){ex.printStackTrace();}
             
         } catch (SQLException ex) {
             // Gérer l'exception, par exemple, afficher un message d'erreur
@@ -157,5 +157,10 @@ public class Clients_View extends Div{
 
     return dialogLayout;
 }
+    
+    private void UpdateClients (Connection con) throws SQLException{
+        List<Client> Clients = GestionBDD.GetClients(con);
+        grid.setItems(Clients);
+    }
     
 }
