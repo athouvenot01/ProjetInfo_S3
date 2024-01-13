@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -44,10 +45,12 @@ import java.util.List;
 @Route(value = "machine_View", layout = UI.class)
 public class machine_View extends Div {
     
-    
+    private Grid<Machine> grid = new Grid<>();
     
     public machine_View() throws SQLException {
-        try (Connection con = GestionBDD.connectSurServeurM3()){
+        
+        Connection con = GestionBDD.connectSurServeurM3();
+            
             H2 titre_View = new H2("Registre des machines");
             Button B1 = new Button ("Supprimer une machine ",VaadinIcon.TRASH.create());
             Button B2 = new Button ("Ajouter une machine",VaadinIcon.PLUS.create());
@@ -60,69 +63,64 @@ public class machine_View extends Div {
                 getUI().ifPresent(ui -> ui.navigate(""));
             });
             
-            B1.addClickListener(click -> {
-                /*TextField Nom1 = new TextField("id de la machine");
-                Button valider = new Button ("entrer");
-                valider.addClickListener(enter -> {
-                    String valeurTextField = Nom1.getValue();
-                    try {
-                        // Convertir la valeur en int
-                        int valeurInt = Integer.parseInt(valeurTextField);
-                        deleteProduit(con, valeurInt);
-                        afficherNotification("le produit a bien été supprimé");
-                    }catch (NumberFormatException ex) {
-                        afficherNotification("Veuillez saisir un entier valide");
-                    } catch (SQLException ex) {
-                        Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    });
-                valider.addClickShortcut(Key.ENTER);
-                add(
-                    Nom1,
-                    valider);*/
-            });
-              
-            B2.addClickListener(click -> {
-                
-                Dialog dialog = new Dialog();
-
-                dialog.setHeaderTitle("Nouvelle machine");
-
-                VerticalLayout dialogLayout;
-                
-                try {
-
-                    dialogLayout = createDialogLayout(dialog);
-
-                    dialog.add(dialogLayout);
-                    Button cancelButton = new Button("Cancel", e -> dialog.close());
-                    dialog.getFooter().add(cancelButton);
-                    
-
-
-                dialog.open();
-                } catch (SQLException ex) {
-                    Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-            });
-            
-            // Créer une grille avec les colonnes
             List<Machine> Machines = GestionBDD.Getmachine(con);
-            Grid<Machine> grid = new Grid<>();
             grid.addColumn(Machine::getId).setHeader("Id");
             grid.addColumn(Machine::getRef).setHeader("ref");
             grid.addColumn(Machine::getDes).setHeader("des");
             grid.addColumn(Machine::getPuissance).setHeader("Puissance");
             grid.addColumn(Machine::getEtatmachine).setHeader("Etat Machine");
             grid.setItems(Machines);
-           
+            
             add(
                 titre_View, 
                 grid,
                 new HorizontalLayout(B1, B2, actualiser) 
-                );
-        }
+            );
+            
+            
+            B1.addClickListener(click -> {
+                Set<Machine> selectedItems = grid.getSelectedItems();
+                
+                if(selectedItems.isEmpty()) {
+                    Notification.show("Aucune ligne selectionnée");
+                
+                } else {
+                    Machine selectedBean = selectedItems.iterator().next();
+                    int value = selectedBean.getId();
+                    try {GestionBDD.deleteMachine(con, value);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateMachines(con);} catch (SQLException ex){ex.printStackTrace();}
+                    
+                    Notification.show("Machine "+ selectedBean.getDes()+" supprimée avec succès" , 5000, Notification.Position.TOP_CENTER);
+                }
+            });
+              
+            
+            B2.addClickListener(click -> {
+                
+                Dialog dialog = new Dialog();
+                dialog.setHeaderTitle("Nouvelle machine");
+                VerticalLayout dialogLayout;
+                
+                try {
+
+                    dialogLayout = createDialogLayout(dialog);
+                    
+                    dialog.add(dialogLayout);
+                    Button cancelButton = new Button("Cancel", e -> dialog.close());
+                    dialog.getFooter().add(cancelButton);
+                   
+                    dialog.open();
+                    
+                } catch (SQLException ex) {
+                    Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+            
+            add(
+                titre_View, 
+                grid,
+                new HorizontalLayout(B1, B2, actualiser) 
+            );
     }
 
     
@@ -138,67 +136,73 @@ public class machine_View extends Div {
         notification.open();
     }
     
-  
 
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
-    Connection con = GestionBDD.connectSurServeurM3();
+        
+        Connection con = GestionBDD.connectSurServeurM3();
     
-    TextField id = new TextField("Référence");
-    TextField des = new TextField("Description");
-    
-    IntegerField puissance = new IntegerField("Puissance");
-    Div WSufix = new Div();
-    WSufix.setText("Watt");
-    puissance.setSuffixComponent(WSufix);
-    
-    List<String> items = new ArrayList<>(
-            Arrays.asList("Inactif", "Actif"));
-    
-    ComboBox<String> comboBox = new ComboBox<>("Etat de la machine ");
-    comboBox.setAllowCustomValue(true);
-    comboBox.addCustomValueSetListener(e -> {
-        String customValue = e.getDetail();
-        items.add(customValue);
+        TextField id = new TextField("Référence");
+        TextField des = new TextField("Description");
+
+        IntegerField puissance = new IntegerField("Puissance");
+        Div WSufix = new Div();
+        WSufix.setText("Watt");
+        puissance.setSuffixComponent(WSufix);
+
+        List<String> items = new ArrayList<>(
+                Arrays.asList("Inactif", "Actif"));
+
+        ComboBox<String> comboBox = new ComboBox<>("Etat de la machine ");
+        comboBox.setAllowCustomValue(true);
+        comboBox.addCustomValueSetListener(e -> {
+            String customValue = e.getDetail();
+            items.add(customValue);
+            comboBox.setItems(items);
+            comboBox.setValue(customValue);
+            });
         comboBox.setItems(items);
-        comboBox.setValue(customValue);
+        comboBox.setHelperText("sélectionner l'état de la machine");
+
+        VerticalLayout dialogLayout = new VerticalLayout(id, des, puissance, comboBox);
+        dialogLayout.setPadding(false);
+        dialogLayout.setSpacing(false);
+        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+
+        Button saveButton = new Button("Add");
+        dialog.getFooter().add(saveButton);
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addClickListener(e -> {
+            try {
+                int state = getValueComboBox(comboBox);
+                createMachine(con, id.getValue(), des.getValue(), puissance.getValue(), state);
+                dialog.close();
+                try {UpdateMachines(con);} catch (SQLException ex){ex.printStackTrace();}
+                
+            } catch (SQLException ex) {
+                // Gérer l'exception, par exemple, afficher un message d'erreur
+                ex.printStackTrace();
+
+            }
         });
-    comboBox.setItems(items);
-    comboBox.setHelperText("sélectionner l'état de la machine");
-   
-    VerticalLayout dialogLayout = new VerticalLayout(id, des, puissance, comboBox);
-    dialogLayout.setPadding(false);
-    dialogLayout.setSpacing(false);
-    dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
-    dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
-
-    Button saveButton = new Button("Add");
-    dialog.getFooter().add(saveButton);
-    saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-    saveButton.addClickListener(e -> {
-        try {
-            int state = getValueComboBox(comboBox);
-            createMachine(con, id.getValue(), des.getValue(), puissance.getValue(), state);
-            dialog.close();
-            
-        } catch (SQLException ex) {
-            // Gérer l'exception, par exemple, afficher un message d'erreur
-            ex.printStackTrace();
-
-        }
-    });
+        return dialogLayout;
+    }
 
     
-
-    return dialogLayout;
-}
-
     public int getValueComboBox(ComboBox<String> comboBox){
         if ("Actif".equals(comboBox.getValue())){
-        int state = 1;
-        return state ;
-    }else{
-        int state = 0;
-        return state;
+            int state = 1;
+            return state ;
+        }else{
+            int state = 0;
+            return state;
+        }
     }
+    
+    
+    private void UpdateMachines (Connection con) throws SQLException{
+        List<Machine> Machines = GestionBDD.Getmachine(con);
+        grid.setItems(Machines);
     }
+    
 }
