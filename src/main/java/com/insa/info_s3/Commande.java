@@ -13,11 +13,12 @@ public class Commande {
     private int id ;
     private int idClient;
     private double montant;
-    
-    public commande (int id , int idClient,double montant){
+    private double montantTVA;
+    public commande (int id , int idClient,double montant,double montantTVA){
     this.id=id;
     this.idClient=idClient;
     this.montant=montant;
+    this.montantTVA=montantTVA;
     }
 
         public int getId() {
@@ -43,7 +44,15 @@ public class Commande {
         public void setMontant(double montant) {
             this.montant = montant;
         }
-    
+
+        public double getMontantTVA() {
+            return montantTVA;
+        }
+
+        public void setMontantTVA(double montantTVA) {
+            this.montantTVA = montantTVA;
+        }
+        
     
     }
  }

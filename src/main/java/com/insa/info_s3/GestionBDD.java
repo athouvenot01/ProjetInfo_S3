@@ -4,6 +4,7 @@
  */
 package com.insa.info_s3;
 
+import com.insa.info_s3.Achats.Achat;
 import com.insa.info_s3.Clients.Client;
 import com.insa.info_s3.Commande.commande;
 import com.insa.info_s3.Machines.Machine;
@@ -160,7 +161,7 @@ public class GestionBDD {
     }
     return Materiaux;
 }
-   public static List<commande> GetCommande(Connection con, int idclient) throws SQLException {
+    public static List<commande> GetCommande(Connection con, int idclient) throws SQLException {
     List<commande> commandes = new ArrayList<>();
     String sql = "SELECT id FROM commande WHERE idclient=?";
     
@@ -171,22 +172,43 @@ public class GestionBDD {
             while (resultSet.next()) {
                 int idCommande = resultSet.getInt("id");
                 
-                commande Commande = new commande(idCommande, idclient,MontantCommande(con, idCommande));
+                commande Commande = new commande(idCommande, idclient,MontantCommande(con, idCommande),MontantCommande(con, idCommande)+MontantCommande(con, idCommande)*0.3);
                 commandes.add(Commande);
             }
         }
     }
     return commandes;
 }
+   public static List<Achat> GetAchat(Connection con, int idcommande) throws SQLException {
+    List<Achat> Achats = new ArrayList<>();
+    String sql = "SELECT * FROM achat WHERE idcommande=?";
+    
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+        preparedStatement.setInt(1, idcommande);
+        
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                int idAchat = resultSet.getInt("id");
+                int idProduit = resultSet.getInt("idproduit");
+                int quantité = resultSet.getInt("quantité");
+                
+                
+                Achat achat = new Achat(idAchat, getNomProduitById(con,idProduit),quantité,PrixAchat(con, idProduit, quantité));
+                Achats.add(achat);
+            }
+        }
+    }
+    return Achats;
+}
     public static double MontantCommande (Connection con,int idCommande) throws SQLException{
     double montant=0;
-    String sql = "SELECT * FROM achat WHERE id=?";
+    String sql = "SELECT * FROM achat WHERE idcommande=?";
     
      try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
                 preparedStatement.setInt(1, idCommande);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                montant = montant +PrixAchat(con, resultSet.getInt("idproduit"), resultSet.getInt("quantité"));
+                montant = montant + PrixAchat(con, resultSet.getInt("idproduit"), resultSet.getInt("quantité"));
                 }
             }
      }
@@ -355,6 +377,20 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             }
         }
         return nomPrenomOperateur;
+    }
+     public static String getNomProduitById(Connection con, int idProduit) throws SQLException {
+        String nomProduit = null;
+        String sql = "SELECT des FROM produit WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idProduit);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    nomProduit = resultSet.getString("des");
+                }
+            }
+        }
+        return nomProduit;
     }
  
 
