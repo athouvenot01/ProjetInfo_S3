@@ -30,6 +30,7 @@ public class Machines {
         public void setDes(String des) {
             this.des = des;
         }
+        
          public int getId() {
             return id;
         }
