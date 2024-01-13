@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +42,9 @@ public class poste_travail_View extends Div {
     private Grid<PosteDeTravail.PosteDeTravaille> grid = new Grid<>();
     
     public poste_travail_View() throws SQLException {
-        try (Connection con = GestionBDD.connectSurServeurM3()){
+        
+        Connection con = GestionBDD.connectSurServeurM3();
+                
             H2 titre_View = new H2("Registre des postes de travail");
             Button B1 = new Button ("Supprimer un poste de travail ",VaadinIcon.TRASH.create());
             Button B2 = new Button ("Ajouter un poste de travail",VaadinIcon.PLUS.create());
@@ -55,26 +58,21 @@ public class poste_travail_View extends Div {
             });
             
             B1.addClickListener(click -> {
-                /*TextField Nom1 = new TextField("id de la machine");
-                Button valider = new Button ("entrer");
-                valider.addClickListener(enter -> {
-                    String valeurTextField = Nom1.getValue();
-                    try {
-                        // Convertir la valeur en int
-                        int valeurInt = Integer.parseInt(valeurTextField);
-                        deleteProduit(con, valeurInt);
-                        afficherNotification("le produit a bien été supprimé");
-                    }catch (NumberFormatException ex) {
-                        afficherNotification("Veuillez saisir un entier valide");
-                    } catch (SQLException ex) {
-                        Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    });
-                valider.addClickShortcut(Key.ENTER);
-                add(
-                    Nom1,
-                    valider);*/
+                Set<PosteDeTravaille> selectedItems = grid.getSelectedItems();
+                
+                if(selectedItems.isEmpty()) {
+                    Notification.show("Aucune ligne selectionnée");
+                
+                } else {
+                    PosteDeTravaille selectedBean = selectedItems.iterator().next();
+                    int value = selectedBean.getId();
+                    try {GestionBDD.deletePosteTravail(con, value);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdatePosteDeTravail(con);} catch (SQLException ex){ex.printStackTrace();}
+                    
+                    Notification.show("Poste de travail "+ selectedBean.getId()+" supprimée avec succès" , 5000, Notification.Position.TOP_CENTER);
+                }
             });
+            
               
             B2.addClickListener(click -> {
                 
@@ -120,7 +118,7 @@ public class poste_travail_View extends Div {
                 grid,
                 new HorizontalLayout(B1, B2, actualiser) 
                 );
-        }
+        
     }
 
     
@@ -157,6 +155,8 @@ public class poste_travail_View extends Div {
         try {
             createPosteTravail(con, idmachine.getValue(), idoperateur.getValue());
             dialog.close();
+            try {UpdatePosteDeTravail(con);} catch (SQLException ex){ex.printStackTrace();}
+                
         } catch (SQLException ex) {
             // Gérer l'exception, par exemple, afficher un message d'erreur
             ex.printStackTrace();
@@ -177,6 +177,12 @@ public class poste_travail_View extends Div {
         int state = 0;
         return state;
     }
+    }
+    
+    
+    private void UpdatePosteDeTravail (Connection con) throws SQLException{
+        List<PosteDeTravaille> PosteDeTravail = GestionBDD.GetPostedeTravail(con);
+        grid.setItems(PosteDeTravail);
     }
 }
 
