@@ -160,7 +160,7 @@ public class GestionBDD {
     }
     
     
-    public static List<commande> GetCommandeById(Connection con, int idclient) throws SQLException {
+    public static List<commande> GetCommande(Connection con, int idclient) throws SQLException {
         List<commande> commandes = new ArrayList<>();
         String sql = "SELECT id FROM commande WHERE idclient=?";
 
@@ -174,27 +174,6 @@ public class GestionBDD {
                     commande Commande = new commande(idCommande, idclient,MontantCommande(con, idCommande),MontantCommande(con, idCommande)+MontantCommande(con, idCommande)*0.3);
                     commandes.add(Commande);
                 }
-            }
-        }
-        return commandes;
-    }
-    
-    
-    public static List<commande> GetCommande(Connection con) throws SQLException {
-        List<commande> commandes = new ArrayList<>();
-        String sql = "SELECT * FROM commande ";
-
-        try (PreparedStatement preparedStatement = con.prepareStatement(sql);
-            ResultSet resultSet = preparedStatement.executeQuery()) {
-            
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                int idclient = resultSet.getInt("idclient");
-                double montant = resultSet.getDouble("montant");
-                double montantTVA = resultSet.getDouble("montantTVA");
-                
-                commande Commande = new commande(id, idclient, montant, montantTVA);
-                commandes.add(Commande);
             }
         }
         return commandes;
@@ -1367,7 +1346,6 @@ public class GestionBDD {
             creeBase(con);
             //createMachine(con,"F04","rapide",30);
             lecture(con, new File("lecture.txt"));
-            deleteClient(con, 1);
         } catch (SQLException ex) {
             System.err.println("Code d'erreur SQL : " + ex.getErrorCode());
             System.err.println("Message d'erreur SQL : " + ex.getMessage());

@@ -56,7 +56,7 @@ public class Order_View extends VerticalLayout {
                 Notification.show("Client sélectionné : " + selectedClient.getNom());
 
                 try {
-                    List<commande> commandes = GetCommandeById(con, selectedClient.getId());
+                    List<commande> commandes = GetCommande(con, selectedClient.getId());
                     grid.removeAllColumns(); // Supprime toutes les colonnes existantes
                     grid.addColumn(commande::getId).setHeader("Id");
                     grid.addColumn(commande::getMontant).setHeader("Prix de vente");
@@ -74,13 +74,30 @@ public class Order_View extends VerticalLayout {
                     }).setHeader("Détail");
 
                     grid.setItems(commandes);
+                    
+                    /*
+                    supprimerCommandeButton.addClickListener(click -> {
+                        Set<commande> selectedItems = grid.getSelectedItems();
+
+                        if(selectedItems.isEmpty()) {
+                            Notification.show("Aucune ligne selectionnée");
+
+                        } else {
+                            commande selectedBean = selectedItems.iterator().next();
+                            int value = selectedBean.getId();
+                            try {GestionBDD.deleteMachine(con, value);} catch (SQLException ex){ex.printStackTrace();}
+                            try {UpdateCommandes(con, selectedClient.getId());} catch (SQLException ex){ex.printStackTrace();}
+
+                            Notification.show("Commande "+ selectedBean.getId()+" supprimée avec succès" , 5000, Notification.Position.TOP_CENTER);
+                        }
+                    });*/
 
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
             });
 
-            
+            /*
             supprimerCommandeButton.addClickListener(click -> {
                 Set<commande> selectedItems = grid.getSelectedItems();
                 
@@ -91,11 +108,11 @@ public class Order_View extends VerticalLayout {
                     commande selectedBean = selectedItems.iterator().next();
                     int value = selectedBean.getId();
                     try {GestionBDD.deleteMachine(con, value);} catch (SQLException ex){ex.printStackTrace();}
-                    try {UpdateCommandes(con);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateCommandes(con, selectedClient/getId());} catch (SQLException ex){ex.printStackTrace();}
                     
                     Notification.show("Commande "+ selectedBean.getId()+" supprimée avec succès" , 5000, Notification.Position.TOP_CENTER);
                 }
-            });
+            });*/
             
             // Envelopper les boutons dans un layout horizontal
             HorizontalLayout buttonsLayout = new HorizontalLayout(ajoutCommandeButton, supprimerCommandeButton);
@@ -145,8 +162,8 @@ public class Order_View extends VerticalLayout {
     }
     
     
-    private void UpdateCommandes (Connection con) throws SQLException{
-        List<commande> Commande = GestionBDD.GetCommande(con);
+    private void UpdateCommandes (Connection con, int idClient) throws SQLException{
+        List<commande> Commande = GestionBDD.GetCommande(con, idClient);
         grid.setItems(Commande);
     }
     
