@@ -57,12 +57,7 @@ public class machine_View extends Div {
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             
-            Button actualiser = new Button("Actualiser");
-            actualiser.addClickListener(e -> {
-                // Utiliser la classe UI pour naviguer à la vue principale
-                getUI().ifPresent(ui -> ui.navigate(""));
-            });
-            
+                        
             List<Machine> Machines = GestionBDD.Getmachine(con);
             grid.addColumn(Machine::getId).setHeader("Id");
             grid.addColumn(Machine::getRef).setHeader("ref");
@@ -73,8 +68,8 @@ public class machine_View extends Div {
             
             add(
                 titre_View, 
-                grid,
-                new HorizontalLayout(B1, B2, actualiser) 
+                new VerticalLayout(grid),
+                new HorizontalLayout(B2, B1) 
             );
             
             
@@ -115,12 +110,6 @@ public class machine_View extends Div {
                     Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
-            
-            add(
-                titre_View, 
-                grid,
-                new HorizontalLayout(B1, B2, actualiser) 
-            );
     }
 
     

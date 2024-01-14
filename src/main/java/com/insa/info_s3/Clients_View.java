@@ -92,21 +92,19 @@ public class Clients_View extends Div{
                 VerticalLayout dialogLayout;
                 
                 try {
-
                     dialogLayout = createDialogLayout(dialog);
 
                     dialog.add(dialogLayout);
                     Button cancelButton = new Button("Cancel", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
                     
-
-
-                dialog.open();
+                    dialog.open();
+                    
                 } catch (SQLException ex) {
                     Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
             });
+            
             
             // Créer une grille avec les colonnes
             List<Client> Clients = GestionBDD.GetClients(con);
@@ -117,46 +115,42 @@ public class Clients_View extends Div{
            
             add(
                 titre_View, 
-                grid,
-                new HorizontalLayout(B1, B2, actualiser) 
-                );
-        
+                new VerticalLayout(grid),
+                new HorizontalLayout(B2, B1) 
+            );
     }
     
+    
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
-    Connection con = GestionBDD.connectSurServeurM3();
-    
-    TextField nom = new TextField("nom");
-    TextField prenom = new TextField("prenom");
-    
-    
-   
-    VerticalLayout dialogLayout = new VerticalLayout(nom, prenom);
-    dialogLayout.setPadding(false);
-    dialogLayout.setSpacing(false);
-    dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
-    dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+        
+        Connection con = GestionBDD.connectSurServeurM3();
 
-    Button saveButton = new Button("Add");
-    dialog.getFooter().add(saveButton);
-    saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-    saveButton.addClickListener(e -> {
-        try {
-            createClient(con,nom.getValue(), prenom.getValue());
-            dialog.close();
-            try {UpdateClients(con);} catch (SQLException ex){ex.printStackTrace();}
-            
-        } catch (SQLException ex) {
-            // Gérer l'exception, par exemple, afficher un message d'erreur
-            ex.printStackTrace();
+        TextField nom = new TextField("nom");
+        TextField prenom = new TextField("prenom");
 
-        }
-    });
+        VerticalLayout dialogLayout = new VerticalLayout(nom, prenom);
+        dialogLayout.setPadding(false);
+        dialogLayout.setSpacing(false);
+        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
 
+        Button saveButton = new Button("Add");
+        dialog.getFooter().add(saveButton);
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addClickListener(e -> {
+            try {
+                createClient(con,nom.getValue(), prenom.getValue());
+                dialog.close();
+                try {UpdateClients(con);} catch (SQLException ex){ex.printStackTrace();}
+
+            } catch (SQLException ex) {
+                // Gérer l'exception, par exemple, afficher un message d'erreur
+                ex.printStackTrace();
+            }
+        });
+        return dialogLayout;
+    }
     
-
-    return dialogLayout;
-}
     
     private void UpdateClients (Connection con) throws SQLException{
         List<Client> Clients = GestionBDD.GetClients(con);

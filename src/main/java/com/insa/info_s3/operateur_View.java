@@ -55,12 +55,6 @@ public class operateur_View extends Div {
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             
-            Button actualiser = new Button("Actualiser"); 
-            actualiser.addClickListener(e -> {
-                // Utiliser la classe UI pour naviguer à la vue principale
-                getUI().ifPresent(ui -> ui.navigate(""));
-            });
-            
             
             B1.addClickListener(click -> {
                 Set<Operateur> selectedItems = grid.getSelectedItems();
@@ -113,7 +107,7 @@ public class operateur_View extends Div {
             add(
                 titre_View, 
                 new VerticalLayout(grid),
-                new HorizontalLayout(B1, B2, actualiser) 
+                new HorizontalLayout(B2, B1) 
             );
     }
     
@@ -132,13 +126,13 @@ public class operateur_View extends Div {
     
     
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
+        
         Connection con = GestionBDD.connectSurServeurM3();
 
         TextField prenom = new TextField("Prenom");
         TextField nom = new TextField("Nom");
 
         IntegerField etatoperateur = new IntegerField("état de l'opérateur");
-
 
         VerticalLayout dialogLayout = new VerticalLayout(prenom, nom, etatoperateur);
         dialogLayout.setPadding(false);
@@ -168,6 +162,5 @@ public class operateur_View extends Div {
         List<Operateur> Operateurs = GestionBDD.GetOperateur(con);
         grid.setItems(Operateurs);
     }
-    
     
 }

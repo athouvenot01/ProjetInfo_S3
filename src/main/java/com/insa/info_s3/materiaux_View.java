@@ -58,12 +58,7 @@ public class materiaux_View extends Div {
             Button B2 = new Button ("Ajouter un matériau",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            
-            Button actualiser = new Button("Actualiser");
-            actualiser.addClickListener(e -> {
-                // Utiliser la classe UI pour naviguer à la vue principale
-                //getUI().ifPresent(ui -> ui.navigate(""));
-            });
+                        
             
             B1.addClickListener(click -> {
                 Set<materiaux> selectedItems = grid.getSelectedItems();
@@ -81,27 +76,6 @@ public class materiaux_View extends Div {
                 }
             });
             
-            /*B1.addClickListener(click -> {
-                /*TextField Nom1 = new TextField("id de la machine");
-                Button valider = new Button ("entrer");
-                valider.addClickListener(enter -> {
-                    String valeurTextField = Nom1.getValue();
-                    try {
-                        // Convertir la valeur en int
-                        int valeurInt = Integer.parseInt(valeurTextField);
-                        deleteProduit(con, valeurInt);
-                        afficherNotification("le produit a bien été supprimé");
-                    }catch (NumberFormatException ex) {
-                        afficherNotification("Veuillez saisir un entier valide");
-                    } catch (SQLException ex) {
-                        Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    });
-                valider.addClickShortcut(Key.ENTER);
-                add(
-                    Nom1,
-                    valider);*//*
-            });*/
               
             B2.addClickListener(click -> {
                 
@@ -112,22 +86,18 @@ public class materiaux_View extends Div {
                 VerticalLayout dialogLayout;
                 
                 try {
-
                     dialogLayout = createDialogLayout(dialog);
 
                     dialog.add(dialogLayout);
                     Button cancelButton = new Button("Cancel", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
                     
-
-
-                dialog.open();
+                    dialog.open();
+                    
                 } catch (SQLException ex) {
                     Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
-                
-
                 //Button saveButton = createSaveButton(dialog);
                 //Button cancelButton = new Button("Cancel", e -> dialog.close());
                 //dialog.getFooter().add(cancelButton);
@@ -144,10 +114,9 @@ public class materiaux_View extends Div {
             
             add(
                 titre_View, 
-                grid,
-                new HorizontalLayout(B1, B2, actualiser) 
-                );
-        
+                new VerticalLayout(grid),
+                new HorizontalLayout(B2, B1) 
+            );        
     }
 
     
@@ -163,43 +132,40 @@ public class materiaux_View extends Div {
         notification.open();
     }
     
-  
-
+    
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
-    Connection con = GestionBDD.connectSurServeurM3();
-    
-    
-    TextField des = new TextField("Description");
-    
-    NumberField prix = new NumberField("Prix");
-    Div WSufix = new Div();
-    WSufix.setText("€");
-    prix.setSuffixComponent(WSufix);
-    
-   
-    VerticalLayout dialogLayout = new VerticalLayout(des, prix);
-    dialogLayout.setPadding(false);
-    dialogLayout.setSpacing(false);
-    dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
-    dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+        
+        Connection con = GestionBDD.connectSurServeurM3();
 
-    Button saveButton = new Button("Add");
-    dialog.getFooter().add(saveButton);
-    saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-    saveButton.addClickListener(e -> {
-        try {
-            createMateriaux(con, des.getValue(), prix.getValue());
-            dialog.close();
-            try {UpdateMateriaux(con);} catch (SQLException ex){ex.printStackTrace();}
-            
-        } catch (SQLException ex) {
-            // Gérer l'exception, par exemple, afficher un message d'erreur
-            ex.printStackTrace();
+        TextField des = new TextField("Description");
 
-        }
-    });
-    return dialogLayout;
-}
+        NumberField prix = new NumberField("Prix");
+        Div WSufix = new Div();
+        WSufix.setText("€");
+        prix.setSuffixComponent(WSufix);
+
+        VerticalLayout dialogLayout = new VerticalLayout(des, prix);
+        dialogLayout.setPadding(false);
+        dialogLayout.setSpacing(false);
+        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+
+        Button saveButton = new Button("Add");
+        dialog.getFooter().add(saveButton);
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addClickListener(e -> {
+            try {
+                createMateriaux(con, des.getValue(), prix.getValue());
+                dialog.close();
+                try {UpdateMateriaux(con);} catch (SQLException ex){ex.printStackTrace();}
+
+            } catch (SQLException ex) {
+                // Gérer l'exception, par exemple, afficher un message d'erreur
+                ex.printStackTrace();
+            }
+        });
+        return dialogLayout;
+    }
 
 
     private void UpdateMateriaux (Connection con) throws SQLException{
