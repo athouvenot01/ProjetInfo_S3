@@ -457,6 +457,7 @@ public class GestionBDD {
             }
         }
     }
+    
     //Permet de changer l'etat machine 
     public static void EtatMachine (Connection con, int Etat, int id)throws SQLException{
         String sql ="UPDATE machine SET etatmachine = ? WHERE id = ?";
@@ -466,6 +467,7 @@ public class GestionBDD {
                  preparedStatement.executeUpdate();
         }
     }
+    
     //Permet de changer l'etat opérateur 
     public static void EtatOperateur (Connection con, int Etat, int id)throws SQLException{
         String sql ="UPDATE operateur SET Etat =?  WHERE id = ? ";
