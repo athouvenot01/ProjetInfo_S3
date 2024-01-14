@@ -33,6 +33,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -41,43 +42,36 @@ import java.util.List;
 
 @Route(value = "operateur_View", layout = UI.class)
 public class operateur_View extends Div {
+    
     private Grid<Operateur> grid = new Grid<>();
+    
     public operateur_View() throws SQLException{
        
-        try (Connection con = GestionBDD.connectSurServeurM3()){
+        Connection con = GestionBDD.connectSurServeurM3();
+        
             H2 titre_View = new H2("Registre des opérateurs");
             Button B1 = new Button ("Supprimer un opérateur",VaadinIcon.TRASH.create());
             Button B2 = new Button ("Ajouter un opérateur",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             
-            Button actualiser = new Button("Actualiser"); 
-            actualiser.addClickListener(e -> {
-                // Utiliser la classe UI pour naviguer à la vue principale
-                getUI().ifPresent(ui -> ui.navigate(""));
-            });
             
             B1.addClickListener(click -> {
-                TextField Nom1 = new TextField("entrez l'id de l'opérateur à supprimer");
-                Button valider = new Button ("entrer");
-                valider.addClickListener(enter -> {
-                    String valeurTextField = Nom1.getValue();
-                    try {
-                        // Convertir la valeur en int
-                        int valeurInt = Integer.parseInt(valeurTextField);
-                        deleteProduit(con, valeurInt);
-                        afficherNotification("l'opérateur a bien été supprimé");
-                    }catch (NumberFormatException ex) {
-                        afficherNotification("Veuillez saisir un entier valide");
-                    }catch (SQLException ex) {
-                        Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                });
-            valider.addClickShortcut(Key.ENTER);
-            add(
-                Nom1,
-                valider);
+                Set<Operateur> selectedItems = grid.getSelectedItems();
+                
+                if (selectedItems.isEmpty()) {
+                    Notification.show("Aucun opérateur sélectionné", 2000, Notification.Position.TOP_CENTER);
+                
+                } else {
+                    Operateur selectedBean = selectedItems.iterator().next();
+                    int value = selectedBean.getId();
+                    try {GestionBDD.deleteOperateur(con, value);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
+                    
+                    Notification.show("Machine "+ selectedBean.getPrenom()+" "+selectedBean.getNom()+" supprimé avec succès" , 5000, Notification.Position.TOP_CENTER);
+                }
             });
+            
             
             B2.addClickListener(click -> {
                 
@@ -95,18 +89,15 @@ public class operateur_View extends Div {
                     Button cancelButton = new Button("Cancel", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
                     
-
-
-                dialog.open();
+                    dialog.open();
+                    
                 } catch (SQLException ex) {
                     Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                
             });
             
             // Données pour la grille (liste de listes)
-           List<Operateur> Operateurs = GestionBDD.GetOperateur(con);
+            List<Operateur> Operateurs = GestionBDD.GetOperateur(con);
             grid.addColumn(Operateur::getId).setHeader("IdOperateur");
             grid.addColumn(Operateur::getPrenom).setHeader("Prenom");
             grid.addColumn(Operateur::getNom).setHeader("Nom");
@@ -116,10 +107,10 @@ public class operateur_View extends Div {
             add(
                 titre_View, 
                 new VerticalLayout(grid),
-                new HorizontalLayout(B1, B2, actualiser) 
-                );
-        }
+                new HorizontalLayout(B2, B1) 
+            );
     }
+    
     
     public void afficherNotification(String message) {
         // Créer une notification
@@ -133,40 +124,43 @@ public class operateur_View extends Div {
         notification.open();
     }
     
-    private static VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
-    Connection con = GestionBDD.connectSurServeurM3();
     
-    TextField prenom = new TextField("Prenom");
-    TextField nom = new TextField("Nom");
-    
-    IntegerField etatoperateur = new IntegerField("état de l'opérateur");
-    
-   
-    VerticalLayout dialogLayout = new VerticalLayout(prenom, nom, etatoperateur);
-    dialogLayout.setPadding(false);
-    dialogLayout.setSpacing(false);
-    dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
-    dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+    private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
+        
+        Connection con = GestionBDD.connectSurServeurM3();
 
-    Button saveButton = new Button("Add");
-    dialog.getFooter().add(saveButton);
-    saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-    saveButton.addClickListener(e -> {
-        try {
-            createOperateur(con, prenom.getValue(), nom.getValue(), etatoperateur.getValue());
-            dialog.close();
-            
-        } catch (SQLException ex) {
-            // Gérer l'exception, par exemple, afficher un message d'erreur
-            ex.printStackTrace();
+        TextField prenom = new TextField("Prenom");
+        TextField nom = new TextField("Nom");
 
-        }
-    });
+        IntegerField etatoperateur = new IntegerField("état de l'opérateur");
 
-    
+        VerticalLayout dialogLayout = new VerticalLayout(prenom, nom, etatoperateur);
+        dialogLayout.setPadding(false);
+        dialogLayout.setSpacing(false);
+        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
 
-    return dialogLayout;
+        Button saveButton = new Button("Add");
+        dialog.getFooter().add(saveButton);
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addClickListener(e -> {
+            try {
+                createOperateur(con, prenom.getValue(), nom.getValue(), etatoperateur.getValue());
+                dialog.close();
+                try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
+
+            } catch (SQLException ex) {
+                // Gérer l'exception, par exemple, afficher un message d'erreur
+                ex.printStackTrace();
+            }
+        });
+        return dialogLayout;
     }
     
+    
+    private void UpdateOperateurs (Connection con) throws SQLException{
+        List<Operateur> Operateurs = GestionBDD.GetOperateur(con);
+        grid.setItems(Operateurs);
+    }
     
 }

@@ -38,7 +38,9 @@ import java.util.Set;
 
 @Route(value = "produit_View", layout = UI.class)
 public class produit_View extends Div {
+    
     private Grid<Produits> grid = new Grid<>();
+    
     public produit_View() throws SQLException {
         
         Connection con = GestionBDD.connectSurServeurM3();
@@ -49,14 +51,7 @@ public class produit_View extends Div {
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             
-            Button actualiser = new Button("Actualiser");
-            actualiser.addClickListener(e -> {
-                // Utiliser la classe UI pour naviguer à la vue principale
-                getUI().ifPresent(ui -> ui.navigate(""));
-            });
-            
-           
-              
+                         
             B2.addClickListener(click -> {
                 
                 Dialog dialog = new Dialog();
@@ -70,7 +65,6 @@ public class produit_View extends Div {
                 Button cancelButton = new Button("Cancel", e -> dialog.close());
                 dialog.getFooter().add(cancelButton);
                 dialog.getFooter().add(saveButton);
-
 
                 dialog.open();
                 
@@ -110,20 +104,20 @@ public class produit_View extends Div {
             grid.addColumn(Produits::getPoids).setHeader("Poids");
             grid.setItems(Produit);
 
-            
             add(
                 titre_View, 
                 new VerticalLayout(grid),
-                new HorizontalLayout(B1, B2, actualiser) 
+                new HorizontalLayout(B2, B1) 
                 );
             
-             B1.addClickListener(click -> {
+            
+            B1.addClickListener(click -> {
                  Set<Produits> selectedItems = grid.getSelectedItems();
     
                 if (selectedItems.isEmpty()) {
                     Notification.show("Aucune ligne sélectionnée", 2000, Notification.Position.TOP_CENTER);
+                
                 } else {
-        
                     Produits selectedBean = selectedItems.iterator().next();
                     int prop1Value = selectedBean.getId();
                     try {GestionBDD.deleteProduit(con, prop1Value);} catch (SQLException ex){ex.printStackTrace();}
@@ -131,10 +125,9 @@ public class produit_View extends Div {
                     
                     Notification.show("Produit "+ selectedBean.getDes()+" supprimé avec succès : " , 5000, Notification.Position.TOP_CENTER);
                 }
-                
             });
-    
     }
+    
     
     public void afficherNotification(String message) {
         // Créer une notification
@@ -147,6 +140,7 @@ public class produit_View extends Div {
         // Afficher la notification
         notification.open();
     }
+    
     
     private static VerticalLayout createDialogLayout() {
 
@@ -164,15 +158,18 @@ public class produit_View extends Div {
         return dialogLayout;
     }
     
+    
     private static Button createSaveButton(Dialog dialog) {
         Button saveButton = new Button("Add", e -> dialog.close());
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         return saveButton;
     }
+    
+    
     private void UpdateProduit (Connection con) throws SQLException{
-    List<Produits> Produit = GestionBDD.GetProduits(con);
-    grid.setItems(Produit);
+        List<Produits> Produit = GestionBDD.GetProduits(con);
+        grid.setItems(Produit);
     }
     
 }

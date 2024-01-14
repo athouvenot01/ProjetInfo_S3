@@ -4,6 +4,7 @@
  */
 package com.insa.info_s3;
 
+import com.insa.info_s3.Achats.Achat;
 import com.insa.info_s3.Clients.Client;
 import com.insa.info_s3.Commande.commande;
 import com.insa.info_s3.Machines.Machine;
@@ -60,70 +61,66 @@ public class GestionBDD {
     
     
     public static double PrixAchat(Connection con, int idProduit, int quantité) {
-    double Prix = 0;
-    int PrixMater = 0;
-    double Duree = 0; // Utilisation d'un type primitif
+        double Prix = 0;
+        int PrixMater = 0;
+        double Duree = 0; // Utilisation d'un type primitif
 
-    String sql = "SELECT * FROM produit WHERE id=?";
+        String sql = "SELECT * FROM produit WHERE id=?";
 
-    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-        preparedStatement.setInt(1, idProduit);
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idProduit);
 
-        try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (resultSet.next()) {
-                double Poids = resultSet.getDouble("poids");
-                PrixMater = getPrixbyID(con, resultSet.getInt("idmateriaux"));
-                Prix = Prix + Poids * PrixMater;
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    double Poids = resultSet.getDouble("poids");
+                    PrixMater = getPrixbyID(con, resultSet.getInt("idmateriaux"));
+                    Prix = Prix + Poids * PrixMater;
 
-                Duree = GetDuree(con, idProduit);
-                if (!Double.isNaN(Duree)) {
-                    Prix = Prix + Duree * 0.20;
+                    Duree = GetDuree(con, idProduit);
+                    if (!Double.isNaN(Duree)) {
+                        Prix = Prix + Duree * 0.20;
+                    }
                 }
             }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Gérez l'exception de manière appropriée dans votre application
         }
-    } catch (SQLException e) {
-        e.printStackTrace(); // Gérez l'exception de manière appropriée dans votre application
+        Prix = Prix *quantité;
+        return Prix;
     }
-    Prix = Prix *quantité;
-    return Prix;
-}
-
-
+    
     
     public static Double GetDuree (Connection con,int idProduit) throws SQLException{
-    double Duree = 0;
-    String sql ="SELECT idtype FROM operation WHERE id = ?";
-    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-                preparedStatement.setInt(1, idProduit);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                 while (resultSet.next()) {
-                 Duree=Duree + GetDureeOpe(con,resultSet.getInt("idtypes"));
-                 }
-            }
-    
-    
-    return Duree;}
+        double Duree = 0;
+        String sql ="SELECT idtype FROM operation WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+                    preparedStatement.setInt(1, idProduit);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                     while (resultSet.next()) {
+                     Duree=Duree + GetDureeOpe(con,resultSet.getInt("idtype"));
+                     }
+                }
+        return Duree;}
     }
+    
+    
     public static Double GetDureeOpe(Connection con, int idtype) throws SQLException {
-    Double duree = null;
-    String sql = "SELECT AVG(duree) as duree_totale FROM realise WHERE idType=?";
-    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-        preparedStatement.setInt(1, idtype);
-        try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (resultSet.next()) {
-                duree = resultSet.getDouble("duree_totale");
-                if (resultSet.wasNull()) {
-                    duree = null; // La valeur était NULL dans la base de données
+        Double duree = null;
+        String sql = "SELECT AVG(duree) as duree_totale FROM realise WHERE idType=?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idtype);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    duree = resultSet.getDouble("duree_totale");
+                    if (resultSet.wasNull()) {
+                        duree = null; // La valeur était NULL dans la base de données
+                    }
                 }
             }
         }
+        return duree;
     }
-    return duree;
-}
 
-    
-    
-    
     
     public static List<Client> GetClients (Connection con) throws SQLException{
         List<Client> Clients  = new ArrayList <>();
@@ -141,138 +138,169 @@ public class GestionBDD {
         }
         return Clients;
     }
+    
    
     public static List<materiaux> GetMateriaux(Connection con) throws SQLException {
-    List<materiaux> Materiaux = new ArrayList<>();
-    String sql = "SELECT * FROM materiaux";
-    
-    try (PreparedStatement preparedStatement = con.prepareStatement(sql);
-         ResultSet resultSet = preparedStatement.executeQuery()) {
-        
-        while (resultSet.next()) {
-            int id = resultSet.getInt("id");
-            String des = resultSet.getString("des");
-            int prix = resultSet.getInt("prix");
-            
-            materiaux materiau = new materiaux(id, des, prix);
-            Materiaux.add(materiau);
-        }
-    }
-    return Materiaux;
-}
-   public static List<commande> GetCommande(Connection con, int idclient) throws SQLException {
-    List<commande> commandes = new ArrayList<>();
-    String sql = "SELECT id FROM commande WHERE idclient=?";
-    
-    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-        preparedStatement.setInt(1, idclient);
-        
-        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+        List<materiaux> Materiaux = new ArrayList<>();
+        String sql = "SELECT * FROM materiaux";
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
             while (resultSet.next()) {
-                int idCommande = resultSet.getInt("id");
-                
-                commande Commande = new commande(idCommande, idclient,MontantCommande(con, idCommande));
-                commandes.add(Commande);
+                int id = resultSet.getInt("id");
+                String des = resultSet.getString("des");
+                int prix = resultSet.getInt("prix");
+
+                materiaux materiau = new materiaux(id, des, prix);
+                Materiaux.add(materiau);
             }
         }
+        return Materiaux;
     }
-    return commandes;
-}
-    public static double MontantCommande (Connection con,int idCommande) throws SQLException{
-    double montant=0;
-    String sql = "SELECT * FROM achat WHERE id=?";
     
-     try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-                preparedStatement.setInt(1, idCommande);
+    
+    public static List<commande> GetCommande(Connection con, int idclient) throws SQLException {
+        List<commande> commandes = new ArrayList<>();
+        String sql = "SELECT id FROM commande WHERE idclient=?";
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idclient);
+
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                montant = montant +PrixAchat(con, resultSet.getInt("idproduit"), resultSet.getInt("quantité"));
+                    int idCommande = resultSet.getInt("id");
+
+                    commande Commande = new commande(idCommande, idclient,MontantCommande(con, idCommande),MontantCommande(con, idCommande)+MontantCommande(con, idCommande)*0.3);
+                    commandes.add(Commande);
                 }
             }
-     }
-    return montant;
+        }
+        return commandes;
+    }
+    
+    
+    public static List<Achat> GetAchat(Connection con, int idcommande) throws SQLException {
+        List<Achat> Achats = new ArrayList<>();
+        String sql = "SELECT * FROM achat WHERE idcommande=?";
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idcommande);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int idAchat = resultSet.getInt("id");
+                    int idProduit = resultSet.getInt("idproduit");
+                    int quantité = resultSet.getInt("quantité");
+
+
+                    Achat achat = new Achat(idAchat, getNomProduitById(con,idProduit),quantité,PrixAchat(con, idProduit, quantité));
+                    Achats.add(achat);
+                }
+            }
+        }
+        return Achats;
+    }
+    
+    
+    public static double MontantCommande (Connection con,int idCommande) throws SQLException{
+        double montant=0;
+        String sql = "SELECT * FROM achat WHERE idcommande=?";
+
+         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+                    preparedStatement.setInt(1, idCommande);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                    montant = montant + PrixAchat(con, resultSet.getInt("idproduit"), resultSet.getInt("quantité"));
+                    }
+                }
+         }
+        return montant;
     }
    
 
-      public static List<Operation> GetOperation(Connection con) throws SQLException {
-    List<Operation> operation = new ArrayList<>();
-    String sql = "SELECT * FROM typeoperation";
-    
-    try (PreparedStatement preparedStatement = con.prepareStatement(sql);
-         ResultSet resultSet = preparedStatement.executeQuery()) {
-        
-        while (resultSet.next()) {
-            int id = resultSet.getInt("id");
-            String des = resultSet.getString("des");
-      
-            Operation operations = new Operation(id, des);
-            operation.add(operations);
+    public static List<Operation> GetOperation(Connection con) throws SQLException {
+        List<Operation> operation = new ArrayList<>();
+        String sql = "SELECT * FROM typeoperation";
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String des = resultSet.getString("des");
+
+                Operation operations = new Operation(id, des);
+                operation.add(operations);
+            }
         }
+        return operation;
     }
-    return operation;
-}
+    
+    
     public static List<Operateur> GetOperateur(Connection con) throws SQLException {
-    List<Operateur> operateur = new ArrayList<>();
-    String sql = "SELECT * FROM operateur";
-    
-    try (PreparedStatement preparedStatement = con.prepareStatement(sql);
-         ResultSet resultSet = preparedStatement.executeQuery()) {
-        
-        while (resultSet.next()) {
-            int id = resultSet.getInt("id");
-            String prenom = resultSet.getString("prenom");
-            String nom = resultSet.getString("nom");
-            int etatoperateur = resultSet.getInt("etatoperateur");
-            
-            String statutOperateur = (etatoperateur == 1) ? "En poste" : "Au repos";
-            
-            Operateur operateurs = new Operateur(id, prenom,nom,statutOperateur);
-            operateur.add(operateurs);
-        }
-    }
-    return operateur;
-}
-public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQLException {
-    List<PosteDeTravaille> Poste = new ArrayList<>();
-    String sql = "SELECT * FROM postetravail";
-    
-    try (PreparedStatement preparedStatement = con.prepareStatement(sql);
-         ResultSet resultSet = preparedStatement.executeQuery()) {
-        
-        while (resultSet.next()) {
-            int id = resultSet.getInt("id");
-            int idmachine = resultSet.getInt("idmachine");
-            int idoperateur = resultSet.getInt("idoperateur");
-            PosteDeTravaille poste = new PosteDeTravaille(id, getRefMachinebyId(con, idmachine), getOperateurbyId(con, idoperateur));
-            Poste.add(poste);
-        }
-    }
-    return Poste;
-}
+        List<Operateur> operateur = new ArrayList<>();
+        String sql = "SELECT * FROM operateur";
 
-   public static List<Machine> Getmachine(Connection con) throws SQLException {
-    List<Machine> machines = new ArrayList<>();
-    String sql = "SELECT * FROM machine";
-    
-    try (PreparedStatement preparedStatement = con.prepareStatement(sql);
-         ResultSet resultSet = preparedStatement.executeQuery()) {
-        
-        while (resultSet.next()) {
-            int id = resultSet.getInt("id");
-            String ref = resultSet.getString("ref");
-            String des = resultSet.getString("des");
-            int puissance = resultSet.getInt("puissance");
-            int etatMachine = resultSet.getInt("etatmachine");
-            
-            String statutMachine = (etatMachine == 1) ? "Actif" : "Inactif";
-            
-            Machine machine = new Machine(id, ref, des, puissance, statutMachine);
-            machines.add(machine);
-        }
-    }
-    return machines;
-}
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String prenom = resultSet.getString("prenom");
+                String nom = resultSet.getString("nom");
+                int etatoperateur = resultSet.getInt("etatoperateur");
+
+                String statutOperateur = (etatoperateur == 1) ? "En poste" : "Au repos";
+
+                Operateur operateurs = new Operateur(id, prenom,nom,statutOperateur);
+                operateur.add(operateurs);
+            }
+        }
+        return operateur;
+    }
+    
+    
+    public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQLException {
+        List<PosteDeTravaille> Poste = new ArrayList<>();
+        String sql = "SELECT * FROM postetravail";
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int idmachine = resultSet.getInt("idmachine");
+                int idoperateur = resultSet.getInt("idoperateur");
+                PosteDeTravaille poste = new PosteDeTravaille(id, getRefMachinebyId(con, idmachine), getOperateurbyId(con, idoperateur));
+                Poste.add(poste);
+            }
+        }
+        return Poste;
+    }
+
+    public static List<Machine> Getmachine(Connection con) throws SQLException {
+        List<Machine> machines = new ArrayList<>();
+        String sql = "SELECT * FROM machine";
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String ref = resultSet.getString("ref");
+                String des = resultSet.getString("des");
+                int puissance = resultSet.getInt("puissance");
+                int etatMachine = resultSet.getInt("etatmachine");
+
+                String statutMachine = (etatMachine == 1) ? "Actif" : "Inactif";
+
+                Machine machine = new Machine(id, ref, des, puissance, statutMachine);
+                machines.add(machine);
+            }
+        }
+        return machines;
+    }
     
     
     public static List<Produits> GetProduits (Connection con) throws SQLException{
@@ -310,7 +338,9 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
         }
         return nomMateriaux;
     }
-     public static int getPrixbyID(Connection con, int idMateriaux) throws SQLException {
+    
+    
+    public static int getPrixbyID(Connection con, int idMateriaux) throws SQLException {
         int prixmateriaux = 0;
         String sql = "SELECT prix FROM materiaux WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
@@ -325,7 +355,8 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
         return prixmateriaux;
     }
     
-     public static String getRefMachinebyId(Connection con, int idMachine) throws SQLException {
+    
+    public static String getRefMachinebyId(Connection con, int idMachine) throws SQLException {
         String RefMachine = null;
         String sql = "SELECT ref FROM machine WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
@@ -339,8 +370,9 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
         }
         return RefMachine;
     }
-     
-     public static String getOperateurbyId(Connection con, int idOpe) throws SQLException {
+    
+    
+    public static String getOperateurbyId(Connection con, int idOpe) throws SQLException {
         String nomPrenomOperateur = null;
         String sql = "SELECT nom,prenom FROM operateur WHERE id = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
@@ -355,6 +387,22 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             }
         }
         return nomPrenomOperateur;
+    }
+    
+    
+    public static String getNomProduitById(Connection con, int idProduit) throws SQLException {
+        String nomProduit = null;
+        String sql = "SELECT des FROM produit WHERE id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idProduit);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    nomProduit = resultSet.getString("des");
+                }
+            }
+        }
+        return nomProduit;
     }
  
 
@@ -388,6 +436,7 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
             }
         }
     }
+    
     //Permet de changer l'etat machine 
     public static void EtatMachine (Connection con, int Etat, int id)throws SQLException{
         String sql ="UPDATE machine SET etatmachine = ? WHERE id = ?";
@@ -397,6 +446,7 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
                  preparedStatement.executeUpdate();
         }
     }
+    
     //Permet de changer l'etat opérateur 
     public static void EtatOperateur (Connection con, int Etat, int id)throws SQLException{
         String sql ="UPDATE operateur SET Etat =?  WHERE id = ? ";
@@ -787,7 +837,7 @@ public static List<PosteDeTravaille> GetPostedeTravail(Connection con) throws SQ
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             preparedStatement.setInt(1, commandeId);
             while (getIdByCommande(con, commandeId) != 0) {
-                deleteClient(con, getIdByClient(con, commandeId));
+                deleteAchat(con, getIdByCommande(con, commandeId));
             }
             int rowCount = preparedStatement.executeUpdate();
             if (rowCount > 0) {

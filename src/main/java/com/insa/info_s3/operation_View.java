@@ -50,19 +50,14 @@ public class operation_View extends Div {
     
     public operation_View() throws SQLException {
         
-        try (Connection con = GestionBDD.connectSurServeurM3()){
+        Connection con = GestionBDD.connectSurServeurM3();
            
             H2 titre_View = new H2("Registre des opérations");
             Button B1 = new Button ("Supprimer une opération",VaadinIcon.TRASH.create());
             Button B2 = new Button ("Ajouter une opération",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            
-            Button actualiser = new Button("Actualiser");
-            actualiser.addClickListener(e -> {
-                // Utiliser la classe UI pour naviguer à la vue principale
-                getUI().ifPresent(ui -> ui.navigate(""));
-            });
+                        
             
             B1.addClickListener(click -> {
                 TextField Nom1 = new TextField("id de l'opération");
@@ -85,6 +80,7 @@ public class operation_View extends Div {
                     Nom1,
                     valider);
             });
+            
               
             B2.addClickListener(click -> {
                 
@@ -95,16 +91,14 @@ public class operation_View extends Div {
                 VerticalLayout dialogLayout;
                 
                 try {
-
                     dialogLayout = createDialogLayout(dialog);
 
                     dialog.add(dialogLayout);
                     Button cancelButton = new Button("Cancel", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
                     
-
-
-                dialog.open();
+                    dialog.open();
+                    
                 } catch (Exception ex) {
                     Logger.getLogger(operation_View.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -117,20 +111,11 @@ public class operation_View extends Div {
             grid.addColumn(Operation::getDes).setHeader("des");
             grid.setItems(Operations);
 
-            
-            
             add(
                 titre_View, 
                 new VerticalLayout(grid),
-                new HorizontalLayout(B1, B2, actualiser) 
-                );
-            
-            
-        }catch (SQLException ex) {
-            System.out.println("probleme : " + ex.getLocalizedMessage());
-            ex.printStackTrace();
-        }
-    
+                new HorizontalLayout(B2, B1) 
+            ); 
     }
     
     public void afficherNotification(String message) {

@@ -9,16 +9,19 @@ package com.insa.info_s3;
  * @author Emilien
  */
 public class Commande {
-    public static class commande {
-    private int id ;
-    private int idClient;
-    private double montant;
     
-    public commande (int id , int idClient,double montant){
-    this.id=id;
-    this.idClient=idClient;
-    this.montant=montant;
-    }
+    public static class commande {
+        private int id ;
+        private int idClient;
+        private double montant;
+        private double montantTVA;
+    
+        public commande (int id , int idClient,double montant,double montantTVA){
+            this.id=id;
+            this.idClient=idClient;
+            this.montant=montant;
+            this.montantTVA=montantTVA;
+        }
 
         public int getId() {
             return id;
@@ -43,7 +46,15 @@ public class Commande {
         public void setMontant(double montant) {
             this.montant = montant;
         }
-    
+
+        public double getMontantTVA() {
+            return montantTVA;
+        }
+
+        public void setMontantTVA(double montantTVA) {
+            this.montantTVA = montantTVA;
+        }
+        
     
     }
  }
