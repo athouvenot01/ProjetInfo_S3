@@ -171,7 +171,7 @@ public class GestionBDD {
                 while (resultSet.next()) {
                     int idCommande = resultSet.getInt("id");
 
-                    commande Commande = new commande(idCommande, idclient,MontantCommande(con, idCommande),MontantCommande(con, idCommande)+MontantCommande(con, idCommande)*0.3);
+                    commande Commande = new commande(idCommande, idclient,MontantCommande(con, idCommande),1.3*MontantCommande(con, idCommande));
                     commandes.add(Commande);
                 }
             }
@@ -865,16 +865,27 @@ public class GestionBDD {
     }
     
     //Ici c'est la création du poste d'une commande
-    public static void createCommande(Connection con, int idclient) throws SQLException {
-        String sql = "INSERT INTO commande (idclient) VALUES (?)"; 
-        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
-            preparedStatement.setInt(1, idclient);
-
-            preparedStatement.executeUpdate();
-            System.out.println("Commande créée avec succès !");
-        }   
-    }
+    public static int createCommande(Connection con, int idclient) throws SQLException {
+    String sql = "INSERT INTO commande (idclient) VALUES (?)"; 
     
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        preparedStatement.setInt(1, idclient);
+
+        preparedStatement.executeUpdate();
+        System.out.println("Commande créée avec succès !");
+        
+        try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                int idNouvelleCommande = generatedKeys.getInt(1);
+                return idNouvelleCommande;
+            } else {
+                throw new SQLException("Échec de la récupération de l'ID de la nouvelle commande.");
+            }
+        }
+    }
+}
+
+   
     //Ici suppresion d'une commande
     public static void deleteCommande(Connection con, int commandeId) throws SQLException {
         String sql = "DELETE FROM commande WHERE id = ?";
