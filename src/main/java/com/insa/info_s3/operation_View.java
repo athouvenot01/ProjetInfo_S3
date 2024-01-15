@@ -69,7 +69,7 @@ public class operation_View extends Div {
                 } else {
                     Operations.Operation selectedBean = selectedItems.iterator().next();
                     int prop1Value = selectedBean.getId();
-                    try {GestionBDD.deleteProduit(con, prop1Value);} catch (SQLException ex){ex.printStackTrace();}
+                    try {GestionBDD.deleteOperation(con, prop1Value);} catch (SQLException ex){ex.printStackTrace();}
                     try {UpdateOperation(con);} catch (SQLException ex){ex.printStackTrace();}
                     
                     Notification.show("Opération "+ selectedBean.getDes()+" supprimée avec succès : " , 5000, Notification.Position.TOP_CENTER);
