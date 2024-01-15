@@ -4,9 +4,12 @@
  */
 package com.insa.info_s3;
 
+import static com.insa.info_s3.GestionBDD.createRealise;
 import static com.insa.info_s3.GestionBDD.createMachine;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
+import static com.insa.info_s3.GestionBDD.getidMachineByRef;
 import com.insa.info_s3.Machines.Machine;
+import com.insa.info_s3.Operations.Operation;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -46,6 +49,11 @@ import java.util.Set;
 public class machine_View extends Div {
     
     private Grid<Machine> grid = new Grid<>();
+    private ComboBox<Operations.Operation> comboop = new ComboBox<>("type d'opérations");
+    private TextField ref = new TextField("Référence");
+    private TextField des = new TextField("Description");
+    private ComboBox<String> comboBox = new ComboBox<>("Etat de la machine ");
+    private NumberField duree = new NumberField("Durée");
     
     public machine_View() throws SQLException {
         
@@ -101,7 +109,7 @@ public class machine_View extends Div {
                     dialogLayout = createDialogLayout(dialog);
                     
                     dialog.add(dialogLayout);
-                    Button cancelButton = new Button("Cancel", e -> dialog.close());
+                    Button cancelButton = new Button("Annuler", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
                    
                     dialog.open();
@@ -130,18 +138,26 @@ public class machine_View extends Div {
         
         Connection con = GestionBDD.connectSurServeurM3();
     
-        TextField id = new TextField("Référence");
-        TextField des = new TextField("Description");
+        
 
         IntegerField puissance = new IntegerField("Puissance");
         Div WSufix = new Div();
         WSufix.setText("Watt");
         puissance.setSuffixComponent(WSufix);
+        
+        List<Operations.Operation> Operations = GestionBDD.GetOperation(con);
+        
+        comboop.setAllowCustomValue(true);
+        comboop.setItems(Operations);
+        comboop.setHelperText("sélectionner l'opération que réalise la machine");
+        
+        
+        Div DSufix = new Div();
+        DSufix.setText("secondes");
+        duree.setSuffixComponent(DSufix);
 
         List<String> items = new ArrayList<>(
                 Arrays.asList("Inactif", "Actif"));
-
-        ComboBox<String> comboBox = new ComboBox<>("Etat de la machine ");
         comboBox.setAllowCustomValue(true);
         comboBox.addCustomValueSetListener(e -> {
             String customValue = e.getDetail();
@@ -152,26 +168,29 @@ public class machine_View extends Div {
         comboBox.setItems(items);
         comboBox.setHelperText("sélectionner l'état de la machine");
 
-        VerticalLayout dialogLayout = new VerticalLayout(id, des, puissance, comboBox);
+        VerticalLayout dialogLayout = new VerticalLayout(ref, des, puissance, comboBox,comboop, duree);
         dialogLayout.setPadding(false);
         dialogLayout.setSpacing(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
 
-        Button saveButton = new Button("Add");
+        Button saveButton = new Button("Ajout");
         dialog.getFooter().add(saveButton);
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
-            try {
-                int state = getValueComboBox(comboBox);
-                createMachine(con, id.getValue(), des.getValue(), puissance.getValue(), state);
-                dialog.close();
-                try {UpdateMachines(con);} catch (SQLException ex){ex.printStackTrace();}
+            if (ChampRemplis()){
+                try {
+                    int state = getValueComboBox(comboBox);
+                    createMachine(con, ref.getValue(), des.getValue(), puissance.getValue(), state);
+                    createRealise(con, getidMachineByRef(con, ref.getValue()),comboop.getValue().getId(),duree.getValue().longValue());
+                    Notification.show("La machine a été crée avec succès");
+                    dialog.close();
+                    try {UpdateMachines(con);} catch (SQLException ex){ex.printStackTrace();}
                 
-            } catch (SQLException ex) {
-                // Gérer l'exception, par exemple, afficher un message d'erreur
-                ex.printStackTrace();
-
+                } catch (SQLException ex) {
+                    // Gérer l'exception, par exemple, afficher un message d'erreur
+                    ex.printStackTrace();
+                }
             }
         });
         return dialogLayout;
@@ -192,6 +211,13 @@ public class machine_View extends Div {
     private void UpdateMachines (Connection con) throws SQLException{
         List<Machine> Machines = GestionBDD.Getmachine(con);
         grid.setItems(Machines);
+    }
+    
+    public boolean ChampRemplis(){
+        if (ref.getValue()!=null && des.getValue()!=null && duree.getValue()!=null && comboBox.getValue()!=null && comboop.getValue()!=null){
+            return true;
+        }
+        return false ;
     }
     
 }

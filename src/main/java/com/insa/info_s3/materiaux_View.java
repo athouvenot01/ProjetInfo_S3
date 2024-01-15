@@ -72,7 +72,7 @@ public class materiaux_View extends Div {
                     try {GestionBDD.deleteMateriaux(con, value);} catch (SQLException ex){ex.printStackTrace();}
                     try {UpdateMateriaux(con);} catch (SQLException ex){ex.printStackTrace();}
                     
-                    Notification.show("Machine "+ selectedBean.getDes()+" supprimée avec succès" , 5000, Notification.Position.TOP_CENTER);
+                    Notification.show("Matériau "+ selectedBean.getDes()+" supprimé avec succès" , 5000, Notification.Position.TOP_CENTER);
                 }
             });
             
@@ -89,7 +89,7 @@ public class materiaux_View extends Div {
                     dialogLayout = createDialogLayout(dialog);
 
                     dialog.add(dialogLayout);
-                    Button cancelButton = new Button("Cancel", e -> dialog.close());
+                    Button cancelButton = new Button("Annuler", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
                     
                     dialog.open();
@@ -97,12 +97,6 @@ public class materiaux_View extends Div {
                 } catch (SQLException ex) {
                     Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                //Button saveButton = createSaveButton(dialog);
-                //Button cancelButton = new Button("Cancel", e -> dialog.close());
-                //dialog.getFooter().add(cancelButton);
-                //dialog.getFooter().add(saveButton);
-                //dialog.open();
             });
             
             // Créer une grille avec les colonnes
@@ -118,20 +112,6 @@ public class materiaux_View extends Div {
                 new HorizontalLayout(B2, B1) 
             );        
     }
-
-    
-    public void afficherNotification(String message) throws SQLException {
-        // Créer une notification
-        Notification notification = new Notification(
-                message,
-                3000, // Durée d'affichage en millisecondes
-                Notification.Position.MIDDLE
-        );
-
-        // Afficher la notification
-        notification.open();
-    }
-    
     
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
         
@@ -150,12 +130,13 @@ public class materiaux_View extends Div {
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
 
-        Button saveButton = new Button("Add");
+        Button saveButton = new Button("Ajout");
         dialog.getFooter().add(saveButton);
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
             try {
                 createMateriaux(con, des.getValue(), prix.getValue());
+                Notification.show("Le matériau a été créé vec succès");
                 dialog.close();
                 try {UpdateMateriaux(con);} catch (SQLException ex){ex.printStackTrace();}
 

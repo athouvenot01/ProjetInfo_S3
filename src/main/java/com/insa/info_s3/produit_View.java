@@ -4,16 +4,21 @@
  */
 package com.insa.info_s3;
 
+import static com.insa.info_s3.GestionBDD.createMachine;
 import static com.insa.info_s3.GestionBDD.createProduit;
+import static com.insa.info_s3.GestionBDD.createRealise;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.Route;
 import static com.insa.info_s3.GestionBDD.getTableValue;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
+import static com.insa.info_s3.GestionBDD.getidMachineByRef;
+import com.insa.info_s3.Materiaux.materiaux;
 import com.insa.info_s3.Produit.Produits;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -23,8 +28,11 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Arrays;
@@ -40,6 +48,10 @@ import java.util.Set;
 public class produit_View extends Div {
     
     private Grid<Produits> grid = new Grid<>();
+    private ComboBox<Materiaux.materiaux> combomat = new ComboBox<>("matériaux");
+    private TextField ref = new TextField("Référence");
+    private TextField des = new TextField("Description");
+    private IntegerField poids = new IntegerField("poids");
     
     public produit_View() throws SQLException {
         
@@ -55,44 +67,22 @@ public class produit_View extends Div {
             B2.addClickListener(click -> {
                 
                 Dialog dialog = new Dialog();
-
-                dialog.setHeaderTitle("Nouveau produit");
-
-                VerticalLayout dialogLayout = createDialogLayout();
-                dialog.add(dialogLayout);
-
-                Button saveButton = createSaveButton(dialog);
-                Button cancelButton = new Button("Cancel", e -> dialog.close());
-                dialog.getFooter().add(cancelButton);
-                dialog.getFooter().add(saveButton);
-
-                dialog.open();
+                dialog.setHeaderTitle("Nouvelle machine");
+                VerticalLayout dialogLayout;
                 
-                /*TextField ref = new TextField("entrez la référence du produit à ajouter");
-                TextField des = new TextField("entrez la description du produit à ajouter");
-                TextField mat = new TextField("entrez l'id du matériaux du produit à ajouter");
-                Button entrer = new Button("valider");
-             
-                entrer.addClickListener(enter -> {
-                    String valeur_ref = ref.getValue();
-                    String valeur_des = des.getValue();
-                    String valeur_mat = mat.getValue();
-                    try {
-                        // Convertir la valeur en int
-                        int id_mat = Integer.parseInt(valeur_mat);
-                        createProduit(con, valeur_ref, valeur_des, id_mat);
-                    } catch (NumberFormatException ex) {
-                        afficherNotification("Veuillez saisir un entier valide");
-                    }catch (SQLException ex) {
-                        Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                });
-                        
-                add(
-                    ref, 
-                    des, 
-                    mat,
-                    entrer);*/
+                try {
+
+                    dialogLayout = createDialogLayout(dialog);
+                    
+                    dialog.add(dialogLayout);
+                    Button cancelButton = new Button("Annuler", e -> dialog.close());
+                    dialog.getFooter().add(cancelButton);
+                   
+                    dialog.open();
+                    
+                } catch (SQLException ex) {
+                    Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
+                }
             });
             
          
@@ -129,47 +119,59 @@ public class produit_View extends Div {
     }
     
     
-    public void afficherNotification(String message) {
-        // Créer une notification
-        Notification notification = new Notification(
-                message,
-                3000, // Durée d'affichage en millisecondes
-                Notification.Position.MIDDLE
-        );
+    private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
 
-        // Afficher la notification
-        notification.open();
-    }
+        Connection con = GestionBDD.connectSurServeurM3();
     
-    
-    private static VerticalLayout createDialogLayout() {
+        List<Materiaux.materiaux> Materiaux = GestionBDD.GetMateriaux(con);
+        
+        combomat.setAllowCustomValue(true);
+        
+        combomat.setItems(Materiaux);
+        combomat.setHelperText("sélectionner le matériau du produit");
+        
+        
+        Div PSufix = new Div();
+        PSufix.setText("kg");
+        poids.setSuffixComponent(PSufix);
 
-        TextField id = new TextField("référence ");
-        TextField des = new TextField("description ");
-        TextField puissance = new TextField("id du matériau");
-
-        VerticalLayout dialogLayout = new VerticalLayout(id,
-                des,puissance);
+        VerticalLayout dialogLayout = new VerticalLayout(ref, des,poids,combomat);
         dialogLayout.setPadding(false);
         dialogLayout.setSpacing(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
 
-        return dialogLayout;
-    }
-    
-    
-    private static Button createSaveButton(Dialog dialog) {
-        Button saveButton = new Button("Add", e -> dialog.close());
+        Button saveButton = new Button("Ajout");
+        dialog.getFooter().add(saveButton);
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-        return saveButton;
+        saveButton.addClickListener(e -> {
+            if (ChampRemplis()){
+                try {
+                    createProduit(con, ref.getValue(), des.getValue(), combomat.getValue().getId(),poids.getValue());
+                    Notification.show("Le produit a été crée avec succès");
+                    dialog.close();
+                    try {UpdateProduit(con);} catch (SQLException ex){ex.printStackTrace();}
+                
+                } catch (SQLException ex) {
+                    // Gérer l'exception, par exemple, afficher un message d'erreur
+                    ex.printStackTrace();
+                }
+            }
+        });
+        return dialogLayout;
     }
     
     
     private void UpdateProduit (Connection con) throws SQLException{
         List<Produits> Produit = GestionBDD.GetProduits(con);
         grid.setItems(Produit);
+    }
+    
+    public boolean ChampRemplis(){
+        if (ref.getValue()!=null && des.getValue()!=null && poids.getValue()!=null && combomat.getValue()!=null){
+            return true;
+        }
+        return false ;
     }
     
 }

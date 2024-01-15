@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -60,25 +61,19 @@ public class operation_View extends Div {
                         
             
             B1.addClickListener(click -> {
-                TextField Nom1 = new TextField("id de l'opération");
-                Button valider = new Button ("entrer");
-                valider.addClickListener(enter -> {
-                    String valeurTextField = Nom1.getValue();
-                    try {
-                        // Convertir la valeur en int
-                        int id_operation = Integer.parseInt(valeurTextField);
-                        deleteOperation(con, id_operation);
-                        afficherNotification("l'opération a bien été supprimé");
-                    }catch (NumberFormatException ex) {
-                        afficherNotification("Veuillez saisir un entier valide");
-                    } catch (SQLException ex) {
-                        Logger.getLogger(produit_View.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    });
-                valider.addClickShortcut(Key.ENTER);
-                add(
-                    Nom1,
-                    valider);
+                Set<Operations.Operation> selectedItems = grid.getSelectedItems();
+    
+                if (selectedItems.isEmpty()) {
+                    Notification.show("Aucune ligne sélectionnée", 2000, Notification.Position.TOP_CENTER);
+                
+                } else {
+                    Operations.Operation selectedBean = selectedItems.iterator().next();
+                    int prop1Value = selectedBean.getId();
+                    try {GestionBDD.deleteProduit(con, prop1Value);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateOperation(con);} catch (SQLException ex){ex.printStackTrace();}
+                    
+                    Notification.show("Opération "+ selectedBean.getDes()+" supprimée avec succès : " , 5000, Notification.Position.TOP_CENTER);
+                }
             });
             
               
@@ -94,7 +89,7 @@ public class operation_View extends Div {
                     dialogLayout = createDialogLayout(dialog);
 
                     dialog.add(dialogLayout);
-                    Button cancelButton = new Button("Cancel", e -> dialog.close());
+                    Button cancelButton = new Button("Annuler", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
                     
                     dialog.open();
@@ -142,12 +137,13 @@ public class operation_View extends Div {
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
 
-        Button saveButton = new Button("Add");
+        Button saveButton = new Button("Ajout");
         dialog.getFooter().add(saveButton);
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
             try {
                 createOperation(con, idtype.getValue(), idproduit.getValue());
+                Notification.show("L'opération a été créée vec succès");
                 dialog.close();
             
             } catch (SQLException ex) {
@@ -159,6 +155,11 @@ public class operation_View extends Div {
     
 
     return dialogLayout;
+    }
+    
+    private void UpdateOperation (Connection con) throws SQLException{
+        List<Operations.Operation> Operation = GestionBDD.GetOperation(con);
+        grid.setItems(Operation);
     }
     
 }

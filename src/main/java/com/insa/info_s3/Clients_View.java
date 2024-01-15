@@ -95,7 +95,7 @@ public class Clients_View extends Div{
                     dialogLayout = createDialogLayout(dialog);
 
                     dialog.add(dialogLayout);
-                    Button cancelButton = new Button("Cancel", e -> dialog.close());
+                    Button cancelButton = new Button("Annuler", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
                     
                     dialog.open();
@@ -134,12 +134,13 @@ public class Clients_View extends Div{
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
 
-        Button saveButton = new Button("Add");
+        Button saveButton = new Button("Ajout");
         dialog.getFooter().add(saveButton);
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
             try {
                 createClient(con,nom.getValue(), prenom.getValue());
+                Notification.show("Le client a été créé avec succès");
                 dialog.close();
                 try {UpdateClients(con);} catch (SQLException ex){ex.printStackTrace();}
 

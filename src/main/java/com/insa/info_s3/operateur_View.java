@@ -44,6 +44,7 @@ import java.util.Set;
 public class operateur_View extends Div {
     
     private Grid<Operateur> grid = new Grid<>();
+    private ComboBox<String> comboBox = new ComboBox<>("Etat de l'opérateur ");
     
     public operateur_View() throws SQLException{
        
@@ -68,7 +69,7 @@ public class operateur_View extends Div {
                     try {GestionBDD.deleteOperateur(con, value);} catch (SQLException ex){ex.printStackTrace();}
                     try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
                     
-                    Notification.show("Machine "+ selectedBean.getPrenom()+" "+selectedBean.getNom()+" supprimé avec succès" , 5000, Notification.Position.TOP_CENTER);
+                    Notification.show("Opérateur "+ selectedBean.getPrenom()+" "+selectedBean.getNom()+" supprimé avec succès" , 5000, Notification.Position.TOP_CENTER);
                 }
             });
             
@@ -86,7 +87,7 @@ public class operateur_View extends Div {
                     dialogLayout = createDialogLayout(dialog);
 
                     dialog.add(dialogLayout);
-                    Button cancelButton = new Button("Cancel", e -> dialog.close());
+                    Button cancelButton = new Button("Annuler", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
                     
                     dialog.open();
@@ -132,20 +133,33 @@ public class operateur_View extends Div {
         TextField prenom = new TextField("Prenom");
         TextField nom = new TextField("Nom");
 
-        IntegerField etatoperateur = new IntegerField("état de l'opérateur");
+        
+        List<String> items = new ArrayList<>(
+                Arrays.asList("En poste", "Au repos"));
+        comboBox.setAllowCustomValue(true);
+        comboBox.addCustomValueSetListener(e -> {
+            String customValue = e.getDetail();
+            items.add(customValue);
+            comboBox.setItems(items);
+            comboBox.setValue(customValue);
+            });
+        comboBox.setItems(items);
+        comboBox.setHelperText("sélectionner l'état de l'opérateur");
 
-        VerticalLayout dialogLayout = new VerticalLayout(prenom, nom, etatoperateur);
+        VerticalLayout dialogLayout = new VerticalLayout(prenom, nom, comboBox);
         dialogLayout.setPadding(false);
         dialogLayout.setSpacing(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
 
-        Button saveButton = new Button("Add");
+        Button saveButton = new Button("Ajout");
         dialog.getFooter().add(saveButton);
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
             try {
-                createOperateur(con, prenom.getValue(), nom.getValue(), etatoperateur.getValue());
+                int state = getValueComboBox(comboBox);
+                createOperateur(con, prenom.getValue(), nom.getValue(), state);
+                Notification.show("L'opérateur a été ajouté vec succès");
                 dialog.close();
                 try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
 
@@ -163,4 +177,13 @@ public class operateur_View extends Div {
         grid.setItems(Operateurs);
     }
     
+    public int getValueComboBox(ComboBox<String> comboBox){
+        if ("Actif".equals(comboBox.getValue())){
+            int state = 1;
+            return state ;
+        }else{
+            int state = 0;
+            return state;
+        }
+    }
 }

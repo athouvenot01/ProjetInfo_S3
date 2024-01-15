@@ -82,7 +82,7 @@ public class poste_travail_View extends Div {
                     dialogLayout = createDialogLayout(dialog);
 
                     dialog.add(dialogLayout);
-                    Button cancelButton = new Button("Cancel", e -> dialog.close());
+                    Button cancelButton = new Button("Annuler", e -> dialog.close());
                     dialog.getFooter().add(cancelButton);
                     
 
@@ -91,14 +91,6 @@ public class poste_travail_View extends Div {
                 } catch (SQLException ex) {
                     Logger.getLogger(machine_View.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                
-
-                //Button saveButton = createSaveButton(dialog);
-                //Button cancelButton = new Button("Cancel", e -> dialog.close());
-                //dialog.getFooter().add(cancelButton);
-                //dialog.getFooter().add(saveButton);
-                //dialog.open();
             });
             
             // Créer une grille avec les colonnes
@@ -143,12 +135,13 @@ public class poste_travail_View extends Div {
     dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
     dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
 
-    Button saveButton = new Button("Add");
+    Button saveButton = new Button("Ajout");
     dialog.getFooter().add(saveButton);
     saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     saveButton.addClickListener(e -> {
         try {
             createPosteTravail(con, idmachine.getValue(), idoperateur.getValue());
+            Notification.show("Le poste de travail a été créé vec succès");
             dialog.close();
             try {UpdatePosteDeTravail(con);} catch (SQLException ex){ex.printStackTrace();}
                 

@@ -421,6 +421,21 @@ public class GestionBDD {
         }   
     }
     
+    public static int getidMachineByRef(Connection con, String ref) throws SQLException {
+        int idmachine = 0;
+        String sql = "SELECT id FROM machine WHERE ref = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setString(1, ref);                        
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    idmachine = resultSet.getInt("id");
+                }
+            }
+        }
+        return idmachine;
+    }
+    
     //Ici suppresion d'une machine 
     public static void deleteMachine(Connection con, int machineId) throws SQLException {
         String sql = "DELETE FROM machine WHERE id = ?";

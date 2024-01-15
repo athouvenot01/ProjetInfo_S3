@@ -35,5 +35,11 @@ public class Operations {
             this.id = id;
         }
 
+        @Override
+        public String toString() {
+            return   des ;
+        }
+        
+
     }
 }
