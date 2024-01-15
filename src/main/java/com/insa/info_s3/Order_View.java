@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import static org.springframework.web.servlet.mvc.method.annotation.SseEmitter.event;
 
 @Route(value = "Order_View", layout = UI.class)
@@ -50,6 +51,27 @@ public class Order_View extends VerticalLayout {
         ajoutCommandeButton.addClickListener(event -> {
             showOrderCreationDialog(con);
         });
+         supprimerCommandeButton.addClickListener(event -> {
+            Set<commande> selectedItems = grid.getSelectedItems();
+
+            for (commande selectedCommande : selectedItems) {
+                int idCommande = selectedCommande.getId();
+                try {
+                    // Utilisez idCommande ou selectedCommande directement pour supprimer la commande
+                    deleteCommande(con, idCommande);
+                    List<Achat> achats = GetAchat(con, selectedCommande.getId());
+                    for (Achat achat : achats) {
+                        deleteAchat(con, achat.getId());
+                    }
+                    Client ClientSelectionne =clientComboBox.getValue();
+                    UpdateCommandes(con, ClientSelectionne.getId());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    // Gérer les erreurs de suppression de commande
+                }
+    }
+            
+             });
 
         clientComboBox.addValueChangeListener(event -> {
             Client selectedClient = event.getValue();
@@ -140,7 +162,19 @@ public class Order_View extends VerticalLayout {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
+        CréationCommande.addClickListener(e -> {
+            Client ClientSelectionne =clientComboBox.getValue();
+            
+            try {
+            int Idcommande = createCommande(con,ClientSelectionne.getId());
+            for (Achat achat : Achats) {
+                createAchat(con, getIdProduitByDesProduit(con, achat.getProduit()), achat.getQuantité(), Idcommande);
+                detailsDialog.close();
+                UpdateCommandes(con, ClientSelectionne.getId());
+            }
+            }catch (SQLException ex){ ex.printStackTrace();}
+            
+        });
         HorizontalLayout gridLayout = new HorizontalLayout();
         gridLayout.add(ProduitGrid,AchatGrid);
         gridLayout.setSpacing(true);
