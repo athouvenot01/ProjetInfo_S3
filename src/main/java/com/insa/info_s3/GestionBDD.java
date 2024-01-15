@@ -502,6 +502,20 @@ public class GestionBDD {
         }
         return idOperation;
     }
+    public static int getIdProduitByDesProduit(Connection con, String des) throws SQLException {
+        int idProduit = 0;
+        String sql = "SELECT id FROM produit WHERE des = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setString(1, des);                        
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    idProduit = resultSet.getInt("id");
+                }
+            }
+        }
+        return idProduit;
+    }
     
     //Ici création d'une réalisation
     public static void createRealise(Connection con, int idmachine, int idtype, long duree) throws SQLException {
