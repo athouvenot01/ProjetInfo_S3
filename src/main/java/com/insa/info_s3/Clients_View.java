@@ -48,6 +48,8 @@ import java.util.Set;
 public class Clients_View extends Div{
     
     private Grid<Client> grid = new Grid<>();
+    private TextField nom = new TextField("nom");
+    private TextField prenom = new TextField("prenom");
     
     public Clients_View() throws SQLException{
         
@@ -125,8 +127,7 @@ public class Clients_View extends Div{
         
         Connection con = GestionBDD.connectSurServeurM3();
 
-        TextField nom = new TextField("nom");
-        TextField prenom = new TextField("prenom");
+        
 
         VerticalLayout dialogLayout = new VerticalLayout(nom, prenom);
         dialogLayout.setPadding(false);
@@ -138,15 +139,17 @@ public class Clients_View extends Div{
         dialog.getFooter().add(saveButton);
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
-            try {
-                createClient(con,nom.getValue(), prenom.getValue());
-                Notification.show("Le client a été créé avec succès");
-                dialog.close();
-                try {UpdateClients(con);} catch (SQLException ex){ex.printStackTrace();}
+            if (ChampRemplis()){
+                try {
+                    createClient(con,nom.getValue(), prenom.getValue());
+                    Notification.show("Le client a été créé avec succès");
+                    dialog.close();
+                    try {UpdateClients(con);} catch (SQLException ex){ex.printStackTrace();}
 
-            } catch (SQLException ex) {
-                // Gérer l'exception, par exemple, afficher un message d'erreur
-                ex.printStackTrace();
+                } catch (SQLException ex) {
+                    // Gérer l'exception, par exemple, afficher un message d'erreur
+                    ex.printStackTrace();
+                }
             }
         });
         return dialogLayout;
@@ -156,6 +159,13 @@ public class Clients_View extends Div{
     private void UpdateClients (Connection con) throws SQLException{
         List<Client> Clients = GestionBDD.GetClients(con);
         grid.setItems(Clients);
+    }
+    
+    public boolean ChampRemplis(){
+        if (nom.getValue()!=null && prenom.getValue()!=null){
+            return true;
+        }
+        return false ;
     }
     
 }

@@ -5,6 +5,7 @@
 package com.insa.info_s3;
 
 import static com.insa.info_s3.GestionBDD.createMachine;
+import static com.insa.info_s3.GestionBDD.createOperation;
 import static com.insa.info_s3.GestionBDD.createProduit;
 import static com.insa.info_s3.GestionBDD.createRealise;
 import com.vaadin.flow.component.grid.Grid;
@@ -12,6 +13,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.Route;
 import static com.insa.info_s3.GestionBDD.getTableValue;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
+import static com.insa.info_s3.GestionBDD.getIdproduitByDes;
 import static com.insa.info_s3.GestionBDD.getidMachineByRef;
 import com.insa.info_s3.Materiaux.materiaux;
 import com.insa.info_s3.Produit.Produits;
@@ -52,6 +54,7 @@ public class produit_View extends Div {
     private TextField ref = new TextField("Référence");
     private TextField des = new TextField("Description");
     private IntegerField poids = new IntegerField("poids");
+    private ComboBox<Operations.Operation> comboop = new ComboBox<>("type d'opérations");
     
     public produit_View() throws SQLException {
         
@@ -122,6 +125,14 @@ public class produit_View extends Div {
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
 
         Connection con = GestionBDD.connectSurServeurM3();
+        
+       
+        
+        List<Operations.Operation> Operations = GestionBDD.GetOperation(con);
+        
+        comboop.setAllowCustomValue(true);
+        comboop.setItems(Operations);
+        comboop.setHelperText("sélectionner le type de l'opération");
     
         List<Materiaux.materiaux> Materiaux = GestionBDD.GetMateriaux(con);
         
@@ -135,7 +146,7 @@ public class produit_View extends Div {
         PSufix.setText("kg");
         poids.setSuffixComponent(PSufix);
 
-        VerticalLayout dialogLayout = new VerticalLayout(ref, des,poids,combomat);
+        VerticalLayout dialogLayout = new VerticalLayout(ref, des,poids,combomat, comboop);
         dialogLayout.setPadding(false);
         dialogLayout.setSpacing(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
@@ -148,6 +159,7 @@ public class produit_View extends Div {
             if (ChampRemplis()){
                 try {
                     createProduit(con, ref.getValue(), des.getValue(), combomat.getValue().getId(),poids.getValue());
+                    createOperation(con, comboop.getValue().getId(),getIdproduitByDes(con,des.getValue()));
                     Notification.show("Le produit a été crée avec succès");
                     dialog.close();
                     try {UpdateProduit(con);} catch (SQLException ex){ex.printStackTrace();}

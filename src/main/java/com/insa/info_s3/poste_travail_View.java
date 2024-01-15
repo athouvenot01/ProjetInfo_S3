@@ -151,17 +151,18 @@ public class poste_travail_View extends Div {
     dialog.getFooter().add(saveButton);
     saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     saveButton.addClickListener(e -> {
-        try {
-            createPosteTravail(con, combomat.getValue().getId(), comboop.getValue().getId());
-            Notification.show("Le poste de travail a été créé vec succès");
-            dialog.close();
-            try {UpdatePosteDeTravail(con);} catch (SQLException ex){ex.printStackTrace();}
+        if (ChampRemplis()){
+            try {
+                createPosteTravail(con, combomat.getValue().getId(), comboop.getValue().getId());
+                Notification.show("Le poste de travail a été créé vec succès");
+                dialog.close();
+                try {UpdatePosteDeTravail(con);} catch (SQLException ex){ex.printStackTrace();}
                 
-        } catch (SQLException ex) {
-            // Gérer l'exception, par exemple, afficher un message d'erreur
-            ex.printStackTrace();
-
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
+        
     });
 
     return dialogLayout;
@@ -177,10 +178,16 @@ public class poste_travail_View extends Div {
     }
     }
     
-    
     private void UpdatePosteDeTravail (Connection con) throws SQLException{
         List<PosteDeTravaille> PosteDeTravail = GestionBDD.GetPostedeTravail(con);
         grid.setItems(PosteDeTravail);
+    }
+    
+    public boolean ChampRemplis(){
+        if (comboop.getValue()!=null && combomat.getValue()!=null){
+            return true;
+        }
+        return false ;
     }
 }
 

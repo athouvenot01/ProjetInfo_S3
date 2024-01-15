@@ -6,6 +6,7 @@ package com.insa.info_s3;
 
 import static com.insa.info_s3.GestionBDD.createOperation;
 import static com.insa.info_s3.GestionBDD.createMachine;
+import static com.insa.info_s3.GestionBDD.createTypeOperation;
 import static com.insa.info_s3.GestionBDD.deleteOperation;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
 import com.insa.info_s3.Operations.Operation;
@@ -48,8 +49,7 @@ import java.util.Set;
 public class operation_View extends Div {
     
     private Grid<Operations.Operation> grid = new Grid<>();
-    private ComboBox<Operations.Operation> comboop = new ComboBox<>("type d'opérations");
-    private ComboBox<Produit.Produits> comboprod = new ComboBox<>("choix du produit");
+    private TextField des = new TextField("description");
     
     public operation_View() throws SQLException {
         
@@ -132,19 +132,8 @@ public class operation_View extends Div {
 
         
         
-        List<Operations.Operation> Operations = GestionBDD.GetOperation(con);
-        
-        comboop.setAllowCustomValue(true);
-        comboop.setItems(Operations);
-        comboop.setHelperText("sélectionner le type de l'opération");
-        
-        List<Produit.Produits> Produit = GestionBDD.GetProduits(con);
-        
-        comboprod.setAllowCustomValue(true);
-        comboprod.setItems(Produit);
-        comboprod.setHelperText("sélectionner le produit lié à l'opération");
     
-        VerticalLayout dialogLayout = new VerticalLayout(comboop, comboprod);
+        VerticalLayout dialogLayout = new VerticalLayout(des);
         dialogLayout.setPadding(false);
         dialogLayout.setSpacing(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
@@ -154,15 +143,19 @@ public class operation_View extends Div {
         dialog.getFooter().add(saveButton);
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
-            try {
-                createOperation(con, comboop.getValue().getId(), comboprod.getValue().getId());
-                Notification.show("L'opération a été créée vec succès");
-                dialog.close();
+            if (ChampRemplis()){
+                try {
+                    createTypeOperation(con, des.getValue());
+                    Notification.show("L'opération a été créée vec succès");
+                    dialog.close();
+                    try {UpdateOperation(con);} catch (SQLException ex){ex.printStackTrace();}
             
-            } catch (SQLException ex) {
-                // Gérer l'exception, par exemple, afficher un message d'erreur
-                ex.printStackTrace();
+                } catch (SQLException ex) {
+                    // Gérer l'exception, par exemple, afficher un message d'erreur
+                    ex.printStackTrace();
+                }
             }
+            
         });
 
     
@@ -175,4 +168,10 @@ public class operation_View extends Div {
         grid.setItems(Operation);
     }
     
+    public boolean ChampRemplis(){
+        if (des.getValue()!=null ){
+            return true;
+        }
+        return false ;
+    }
 }

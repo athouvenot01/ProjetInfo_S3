@@ -48,6 +48,8 @@ import java.util.Set;
 public class materiaux_View extends Div {
     
     private Grid<Materiaux.materiaux> grid = new Grid<>();
+    private TextField des = new TextField("Description");
+    private NumberField prix = new NumberField("Prix");
     
     public materiaux_View() throws SQLException{
         
@@ -117,9 +119,7 @@ public class materiaux_View extends Div {
         
         Connection con = GestionBDD.connectSurServeurM3();
 
-        TextField des = new TextField("Description");
-
-        NumberField prix = new NumberField("Prix");
+        
         Div WSufix = new Div();
         WSufix.setText("€");
         prix.setSuffixComponent(WSufix);
@@ -134,16 +134,19 @@ public class materiaux_View extends Div {
         dialog.getFooter().add(saveButton);
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
-            try {
+            if (ChampRemplis()){
+                try {
                 createMateriaux(con, des.getValue(), prix.getValue());
                 Notification.show("Le matériau a été créé vec succès");
                 dialog.close();
                 try {UpdateMateriaux(con);} catch (SQLException ex){ex.printStackTrace();}
 
-            } catch (SQLException ex) {
+                } catch (SQLException ex) {
                 // Gérer l'exception, par exemple, afficher un message d'erreur
                 ex.printStackTrace();
+                }
             }
+            
         });
         return dialogLayout;
     }
@@ -152,6 +155,13 @@ public class materiaux_View extends Div {
     private void UpdateMateriaux (Connection con) throws SQLException{
         List<materiaux> Materiaux = GestionBDD.GetMateriaux(con);
         grid.setItems(Materiaux);
+    }
+    
+    public boolean ChampRemplis(){
+        if (des.getValue()!=null && prix.getValue()!=null){
+            return true;
+        }
+        return false ;
     }
 
 }

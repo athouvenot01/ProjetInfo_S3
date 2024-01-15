@@ -237,6 +237,21 @@ public class GestionBDD {
         return operation;
     }
     
+    public static int getIdproduitByDes(Connection con, String des) throws SQLException {
+        int idproduit = 0;
+        String sql = "SELECT id FROM machine WHERE des = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            preparedStatement.setString(1, des);                        
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    idproduit = resultSet.getInt("id");
+                }
+            }
+        }
+        return idproduit;
+    }
+    
     
     public static List<Operateur> GetOperateur(Connection con) throws SQLException {
         List<Operateur> operateur = new ArrayList<>();
