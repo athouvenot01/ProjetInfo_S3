@@ -56,8 +56,8 @@ public class operation_View extends Div {
         Connection con = GestionBDD.connectSurServeurM3();
            
             H2 titre_View = new H2("Registre des types d'opérations");
-            Button B1 = new Button ("Supprimer une opération",VaadinIcon.TRASH.create());
-            Button B2 = new Button ("Ajouter une opération",VaadinIcon.PLUS.create());
+            Button B1 = new Button ("Supprimer un type d'opération",VaadinIcon.TRASH.create());
+            Button B2 = new Button ("Ajouter un type d'opération",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                         
@@ -74,7 +74,7 @@ public class operation_View extends Div {
                     try {GestionBDD.deleteOperation(con, prop1Value);} catch (SQLException ex){ex.printStackTrace();}
                     try {UpdateOperation(con);} catch (SQLException ex){ex.printStackTrace();}
                     
-                    Notification.show("Opération "+ selectedBean.getDes()+" supprimée avec succès : " , 5000, Notification.Position.TOP_CENTER);
+                    Notification.show("Type d'opération "+ selectedBean.getDes()+" supprimée avec succès : " , 5000, Notification.Position.TOP_CENTER);
                 }
             });
             
@@ -83,7 +83,7 @@ public class operation_View extends Div {
                 
                 Dialog dialog = new Dialog();
 
-                dialog.setHeaderTitle("Nouvelle Operation");
+                dialog.setHeaderTitle("Nouveau type d'peration");
 
                 VerticalLayout dialogLayout;
                 
@@ -146,7 +146,7 @@ public class operation_View extends Div {
             if (ChampRemplis()){
                 try {
                     createTypeOperation(con, des.getValue());
-                    Notification.show("L'opération a été créée vec succès");
+                    Notification.show("Le type d'opération a été créé vec succès");
                     dialog.close();
                     try {UpdateOperation(con);} catch (SQLException ex){ex.printStackTrace();}
             
