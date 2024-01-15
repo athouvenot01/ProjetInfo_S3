@@ -48,12 +48,14 @@ import java.util.Set;
 public class operation_View extends Div {
     
     private Grid<Operations.Operation> grid = new Grid<>();
+    private ComboBox<Operations.Operation> comboop = new ComboBox<>("type d'opérations");
+    private ComboBox<Produit.Produits> comboprod = new ComboBox<>("choix du produit");
     
     public operation_View() throws SQLException {
         
         Connection con = GestionBDD.connectSurServeurM3();
            
-            H2 titre_View = new H2("Registre des opérations");
+            H2 titre_View = new H2("Registre des types d'opérations");
             Button B1 = new Button ("Supprimer une opération",VaadinIcon.TRASH.create());
             Button B2 = new Button ("Ajouter une opération",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
@@ -125,13 +127,24 @@ public class operation_View extends Div {
         notification.open();
     }
     
-    private static VerticalLayout createDialogLayout(Dialog dialog) throws Exception {
+    private VerticalLayout createDialogLayout(Dialog dialog) throws Exception {
         Connection con = GestionBDD.connectSurServeurM3();
 
-        IntegerField idtype = new IntegerField("id du type d'opération");
-        IntegerField idproduit = new IntegerField("id du produit");
+        
+        
+        List<Operations.Operation> Operations = GestionBDD.GetOperation(con);
+        
+        comboop.setAllowCustomValue(true);
+        comboop.setItems(Operations);
+        comboop.setHelperText("sélectionner le type de l'opération");
+        
+        List<Produit.Produits> Produit = GestionBDD.GetProduits(con);
+        
+        comboprod.setAllowCustomValue(true);
+        comboprod.setItems(Produit);
+        comboprod.setHelperText("sélectionner le produit lié à l'opération");
     
-        VerticalLayout dialogLayout = new VerticalLayout(idtype, idproduit);
+        VerticalLayout dialogLayout = new VerticalLayout(comboop, comboprod);
         dialogLayout.setPadding(false);
         dialogLayout.setSpacing(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
@@ -142,7 +155,7 @@ public class operation_View extends Div {
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
             try {
-                createOperation(con, idtype.getValue(), idproduit.getValue());
+                createOperation(con, comboop.getValue().getId(), comboprod.getValue().getId());
                 Notification.show("L'opération a été créée vec succès");
                 dialog.close();
             

@@ -45,6 +45,9 @@ public class operateur_View extends Div {
     
     private Grid<Operateur> grid = new Grid<>();
     private ComboBox<String> comboBox = new ComboBox<>("Etat de l'opérateur ");
+    private TextField prenom = new TextField("Prenom");
+    private TextField nom = new TextField("Nom");
+    
     
     public operateur_View() throws SQLException{
        
@@ -130,9 +133,9 @@ public class operateur_View extends Div {
         
         Connection con = GestionBDD.connectSurServeurM3();
 
-        TextField prenom = new TextField("Prenom");
-        TextField nom = new TextField("Nom");
-
+        
+        List<Operations.Operation> Operations = GestionBDD.GetOperation(con);
+        
         
         List<String> items = new ArrayList<>(
                 Arrays.asList("En poste", "Au repos"));
@@ -156,16 +159,18 @@ public class operateur_View extends Div {
         dialog.getFooter().add(saveButton);
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
-            try {
-                int state = getValueComboBox(comboBox);
-                createOperateur(con, prenom.getValue(), nom.getValue(), state);
-                Notification.show("L'opérateur a été ajouté vec succès");
-                dialog.close();
-                try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
+            if (ChampRemplis()){
+                try {
+                    int state = getValueComboBox(comboBox);
+                    createOperateur(con,nom.getValue(),prenom.getValue(), state);
+                    Notification.show("L'opérateur a été ajouté vec succès");
+                    dialog.close();
+                    try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
 
-            } catch (SQLException ex) {
-                // Gérer l'exception, par exemple, afficher un message d'erreur
-                ex.printStackTrace();
+                } catch (SQLException ex) {
+                    // Gérer l'exception, par exemple, afficher un message d'erreur
+                    ex.printStackTrace();
+                }
             }
         });
         return dialogLayout;
@@ -185,5 +190,12 @@ public class operateur_View extends Div {
             int state = 0;
             return state;
         }
+    }
+    
+    public boolean ChampRemplis(){
+        if (nom.getValue()!=null && prenom.getValue()!=null && comboBox.getValue()!=null ){
+            return true;
+        }
+        return false ;
     }
 }

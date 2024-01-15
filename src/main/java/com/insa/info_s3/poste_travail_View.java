@@ -40,6 +40,8 @@ import java.util.logging.Logger;
 public class poste_travail_View extends Div {
     
     private Grid<PosteDeTravail.PosteDeTravaille> grid = new Grid<>();
+    private ComboBox<Machines.Machine> combomat = new ComboBox<>("choix du matériaux");
+    private ComboBox<Operateurs.Operateur> comboop = new ComboBox<>("choix de l'opérateur");
     
     public poste_travail_View() throws SQLException {
         
@@ -126,10 +128,20 @@ public class poste_travail_View extends Div {
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {
     Connection con = GestionBDD.connectSurServeurM3();
     
-    IntegerField idmachine = new IntegerField("id de la machine");
-    IntegerField idoperateur = new IntegerField("id de l'opérateur");
     
-    VerticalLayout dialogLayout = new VerticalLayout(idmachine, idoperateur);
+    List<Operateurs.Operateur> Operateurs = GestionBDD.GetOperateur(con);
+        
+        comboop.setAllowCustomValue(true);
+        comboop.setItems(Operateurs);
+        comboop.setHelperText("sélectionner le nom de l'opérateur qui travail");
+        
+        List<Machines.Machine> Machines = GestionBDD.Getmachine(con);
+        
+        combomat.setAllowCustomValue(true);
+        combomat.setItems(Machines);
+        combomat.setHelperText("sélectionner la machine de travail");
+    
+    VerticalLayout dialogLayout = new VerticalLayout(comboop, combomat);
     dialogLayout.setPadding(false);
     dialogLayout.setSpacing(false);
     dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
@@ -140,7 +152,7 @@ public class poste_travail_View extends Div {
     saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     saveButton.addClickListener(e -> {
         try {
-            createPosteTravail(con, idmachine.getValue(), idoperateur.getValue());
+            createPosteTravail(con, combomat.getValue().getId(), comboop.getValue().getId());
             Notification.show("Le poste de travail a été créé vec succès");
             dialog.close();
             try {UpdatePosteDeTravail(con);} catch (SQLException ex){ex.printStackTrace();}
@@ -151,8 +163,6 @@ public class poste_travail_View extends Div {
 
         }
     });
-
-    
 
     return dialogLayout;
 }

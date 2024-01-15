@@ -62,6 +62,11 @@ public class Produit {
         public void setPoids(double poids) {
             this.poids = poids;
         }
+
+        @Override
+        public String toString() {
+            return  des ;
+        }
         
        
     }

@@ -67,7 +67,7 @@ public class produit_View extends Div {
             B2.addClickListener(click -> {
                 
                 Dialog dialog = new Dialog();
-                dialog.setHeaderTitle("Nouvelle machine");
+                dialog.setHeaderTitle("Nouveau produit");
                 VerticalLayout dialogLayout;
                 
                 try {
