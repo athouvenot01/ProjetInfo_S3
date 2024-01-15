@@ -65,5 +65,11 @@ public class Machines {
         public void setEtatmachine(String etatmachine) {
             this.etatmachine = etatmachine;
         }
+
+        @Override
+        public String toString() {
+            return des ;        
+        }
+        
     }
 }
