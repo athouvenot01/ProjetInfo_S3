@@ -823,7 +823,24 @@ public class GestionBDD {
             }
         }
     }
+    public static void changerEtatMachine (Connection con , int idMachine , int valeur)throws SQLException {
+    String sql ="UPDATE machine SET etatmachine =? WHERE id=?";
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+                preparedStatement.setInt(1, valeur);
+                preparedStatement.setInt(2, idMachine);
+                preparedStatement.executeUpdate();
+    }
+    }
     
+    public static void changerEtatOperateur (Connection con , int idope , int valeur)throws SQLException {
+    String sql ="UPDATE machine SET etatoperateur =? WHERE id=?";
+    try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+                preparedStatement.setInt(1, valeur);
+                preparedStatement.setInt(2, idope);
+                preparedStatement.executeUpdate();
+    }
+    }
+            
     public static void deletePosteTravailMachine(Connection con, int MachineId) throws SQLException {
         String sql = "DELETE FROM postetravail WHERE idmachine = ?";
         try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
