@@ -54,6 +54,7 @@ public class machine_View extends Div {
     private TextField des = new TextField("Description");
     private ComboBox<String> comboBox = new ComboBox<>("Etat de la machine ");
     private NumberField duree = new NumberField("Durée");
+    private Button B3 = new Button("Modifier");
     
     public machine_View() throws SQLException {
         
@@ -64,6 +65,7 @@ public class machine_View extends Div {
             Button B2 = new Button ("Ajouter une machine",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            B3.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SUCCESS);
             
                         
             List<Machine> Machines = GestionBDD.Getmachine(con);
@@ -77,9 +79,13 @@ public class machine_View extends Div {
             add(
                 titre_View, 
                 new VerticalLayout(grid),
-                new HorizontalLayout(B2, B1) 
+                new HorizontalLayout(B2, B1, B3) 
             );
-            
+            B3.addClickListener(e-> {
+                //if (etat == O ){
+                    
+                
+            });
             
             B1.addClickListener(click -> {
                 Set<Machine> selectedItems = grid.getSelectedItems();

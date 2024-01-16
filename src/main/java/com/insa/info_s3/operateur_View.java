@@ -47,6 +47,7 @@ public class operateur_View extends Div {
     private ComboBox<String> comboBox = new ComboBox<>("Etat de l'opérateur ");
     private TextField prenom = new TextField("Prenom");
     private TextField nom = new TextField("Nom");
+    private Button B3 = new Button("Modifier");
     
     
     public operateur_View() throws SQLException{
@@ -58,7 +59,11 @@ public class operateur_View extends Div {
             Button B2 = new Button ("Ajouter un opérateur",VaadinIcon.PLUS.create());
             B1.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
             B2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            B3.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SUCCESS);
             
+            B3.addClickListener(e->{
+                
+            });
             
             B1.addClickListener(click -> {
                 Set<Operateur> selectedItems = grid.getSelectedItems();

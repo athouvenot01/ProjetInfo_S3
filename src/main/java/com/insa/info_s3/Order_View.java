@@ -10,6 +10,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -41,7 +42,7 @@ public class Order_View extends VerticalLayout {
     public Order_View() throws SQLException {
         Connection con = GestionBDD.connectSurServeurM3();
 
-        
+        H2 titre_View = new H2("Registre des commandes");
         List<Client> clients = GetClients(con);
         clientComboBox.setItems(clients);
         clientComboBox.setItemLabelGenerator(Client::toString);

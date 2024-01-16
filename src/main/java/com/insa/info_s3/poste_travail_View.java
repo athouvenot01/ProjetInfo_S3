@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 public class poste_travail_View extends Div {
     
     private Grid<PosteDeTravail.PosteDeTravaille> grid = new Grid<>();
-    private ComboBox<Machines.Machine> combomat = new ComboBox<>("choix du matériaux");
+    private ComboBox<Machines.Machine> combomat = new ComboBox<>("choix de la machine");
     private ComboBox<Operateurs.Operateur> comboop = new ComboBox<>("choix de l'opérateur");
     
     public poste_travail_View() throws SQLException {
