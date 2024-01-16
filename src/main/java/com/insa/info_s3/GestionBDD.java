@@ -397,7 +397,7 @@ public class GestionBDD {
                 if (resultSet.next()) {
                 String nom = resultSet.getString("nom");
                 String prenom = resultSet.getString("prenom");
-                nomPrenomOperateur = nom + " " + prenom;
+                nomPrenomOperateur =  prenom + " " + nom;
                 }
             }
         }

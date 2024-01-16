@@ -141,7 +141,7 @@ public class Clients_View extends Div{
         saveButton.addClickListener(e -> {
             if (ChampRemplis()){
                 try {
-                    createClient(con,nom.getValue(), prenom.getValue());
+                    createClient(con,prenom.getValue(), nom.getValue());
                     Notification.show("Le client a été créé avec succès");
                     dialog.close();
                     try {UpdateClients(con);} catch (SQLException ex){ex.printStackTrace();}
