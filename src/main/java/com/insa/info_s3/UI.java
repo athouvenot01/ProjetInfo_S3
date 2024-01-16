@@ -44,87 +44,17 @@ public class UI extends AppLayout implements RouterLayout{
             
             DrawerToggle toggle = new DrawerToggle();
 
-            H1 title = new H1("Base de donnée");
+            H1 title = new H1("Chaîne de production");
             title.getStyle().set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
 
             SideNav nav = getSideNav();
 
             Scroller scroller = new Scroller(nav);
-            //scroller.setClassName(LumoUtility.Padding.SMALL);
+            
 
             addToDrawer(scroller);
             addToNavbar(toggle, title);
-            /*H2 title = new H2 ("Binvenue dans la base donnée");
-            Button produit = new Button ("produit");
-            Button machine = new Button ("machine"); 
-            Button realise = new Button ("réalise ");
-            Button typeoperation = new Button ("type d'opération");
-        
-            produit.addClickListener(click ->{
-                List<String> chaines = Arrays.asList(
-                "Chaine 1",
-                "Chaine 2",
-                "Chaine 3"
-            );
-            Grid<String> grid = new Grid<>();
-            grid.setItems(chaines);
-            
-            grid.addColumn(String::toString).setHeader("Colonne de Chaînes");
-
-            add(grid);
-            });
-       
-            machine.addClickListener(click ->{
-                // Créez un composant Grid
-                Grid<Object> liste_machine = new Grid<>(Object.class);
-                
-                // Ajoutez les colonnes au Grid
-                liste_machine.setColumns();
-                
-                // Ajoutez les lignes au Grid
-                liste_machine.setItems();
-                
-                // Ajoutez le Grid à la mise en page
-                add(liste_machine);
-            });
-         
-            realise.addClickListener(click ->{
-               // Créez un composant Grid
-                Grid<Object> liste_realise = new Grid<>(Object.class);
-                
-                // Ajoutez les colonnes au Grid
-                liste_realise.setColumns();
-                
-                // Ajoutez les lignes au Grid
-                liste_realise.setItems();
-                
-                // Ajoutez le Grid à la mise en page
-                add(liste_realise);
-            });
-          
-            typeoperation.addClickListener(click ->{
-                // Créez un composant Grid
-                Grid<Object> liste_typeoperation = new Grid<>(Object.class);
-                
-                // Ajoutez les colonnes au Grid
-                liste_typeoperation.setColumns();
-                
-                // Ajoutez les lignes au Grid
-                liste_typeoperation.setItems();
-                
-                // Ajoutez le Grid à la mise en page
-                add(liste_typeoperation);
-            });
-        
-           
-            add(
-                title, 
-                new VerticalLayout(produit, machine, realise, typeoperation),
-                new RouterLink("Table produit", produit_View.class),
-                new RouterLink("Table machine", machine_View.class)
-                        );
-            */
         }
         catch (SQLException ex) {
             System.out.println("probleme : " + ex.getLocalizedMessage());
