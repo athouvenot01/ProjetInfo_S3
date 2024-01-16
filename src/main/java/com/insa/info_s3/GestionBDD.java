@@ -833,7 +833,7 @@ public class GestionBDD {
     }
     
     public static void changerEtatOperateur (Connection con , int idope , int valeur)throws SQLException {
-    String sql ="UPDATE machine SET etatoperateur =? WHERE id=?";
+    String sql ="UPDATE operateur SET etatoperateur =? WHERE id=?";
     try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
                 preparedStatement.setInt(1, valeur);
                 preparedStatement.setInt(2, idope);
