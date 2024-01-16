@@ -13,6 +13,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.Route;
 import static com.insa.info_s3.GestionBDD.getTableValue;
 import static com.insa.info_s3.GestionBDD.deleteProduit;
+import static com.insa.info_s3.GestionBDD.getIdProduitByDesProduit;
 import static com.insa.info_s3.GestionBDD.getIdproduitByDes;
 import static com.insa.info_s3.GestionBDD.getidMachineByRef;
 import com.insa.info_s3.Materiaux.materiaux;
@@ -159,7 +160,7 @@ public class produit_View extends Div {
             if (ChampRemplis()){
                 try {
                     createProduit(con, ref.getValue(), des.getValue(), combomat.getValue().getId(),poids.getValue());
-                    createOperation(con, comboop.getValue().getId(),getIdproduitByDes(con,des.getValue()));
+                    createOperation(con, comboop.getValue().getId(),getIdProduitByDesProduit(con,des.getValue()));
                     Notification.show("Le produit a été crée avec succès");
                     dialog.close();
                     try {UpdateProduit(con);} catch (SQLException ex){ex.printStackTrace();}
@@ -180,7 +181,7 @@ public class produit_View extends Div {
     }
     
     public boolean ChampRemplis(){
-        if (ref.getValue()!=null && des.getValue()!=null && poids.getValue()!=null && combomat.getValue()!=null){
+        if (ref.getValue()!=null && des.getValue()!=null && poids.getValue()!=null && combomat.getValue()!=null && comboop.getValue()!= null){
             return true;
         }
         return false ;
