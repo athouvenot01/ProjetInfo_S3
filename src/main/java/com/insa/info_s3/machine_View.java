@@ -81,14 +81,31 @@ public class machine_View extends Div {
                 new VerticalLayout(grid),
                 new HorizontalLayout(B2, B1, B3) 
             );
+            
             B3.addClickListener(e-> {
-                if ("Actif".equals(comboBox.getValue())){
-                    //changerEtatOperateur(con, )
-                }
+                Set<Machine> selectedItems = grid.getSelectedItems();
+                for (Machine selectedMachine : selectedItems) {
                 
+                Machine selectedBean = selectedItems.iterator().next();
+                if (selectedItems.isEmpty()) {
+                    Notification.show("Aucun opérateur sélectionné", 2000, Notification.Position.TOP_CENTER);
                 
+                } else if ("Actif" == selectedMachine.getEtatmachine()) {
+                   
+                    int value = selectedBean.getId();
+                    try {GestionBDD.changerEtatMachine(con, value, 0);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateMachines(con);} catch (SQLException ex){ex.printStackTrace();}
                     
-                
+                    Notification.show("Etat de l'opérateur "+ selectedBean.getDes()+" modifié avec succès" , 5000, Notification.Position.TOP_CENTER);
+                }  else {
+                    
+                    int value = selectedBean.getId();
+                    try {GestionBDD.changerEtatMachine(con, value, 1);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateMachines(con);} catch (SQLException ex){ex.printStackTrace();}
+                    
+                    Notification.show("Etat de l'opérateur "+ selectedBean.getDes()+" modifié avec succès" , 5000, Notification.Position.TOP_CENTER);
+                }
+                }
             });
             
             B1.addClickListener(click -> {

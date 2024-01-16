@@ -63,26 +63,28 @@ public class operateur_View extends Div {
             
             B3.addClickListener(e->{
                 Set<Operateur> selectedItems = grid.getSelectedItems();
+                for (Operateur selectedOperateur : selectedItems) {
                 
+                Operateur selectedBean = selectedItems.iterator().next();
                 if (selectedItems.isEmpty()) {
                     Notification.show("Aucun opérateur sélectionné", 2000, Notification.Position.TOP_CENTER);
                 
-                } else if ("Actif".equals(comboBox.getValue())) {
-                    
-                    Operateur selectedBean = selectedItems.iterator().next();
+                } else if ("En poste" == selectedOperateur.getEtatOperateur()) {
+                   
                     int value = selectedBean.getId();
                     try {GestionBDD.changerEtatOperateur(con, value, 0);} catch (SQLException ex){ex.printStackTrace();}
                     try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
                     
-                    Notification.show("Etat de l'opérateur "+ selectedBean.getPrenom()+" "+selectedBean.getNom()+" modifié avec succès" , 5000, Notification.Position.TOP_CENTER);
-                } else {
-                        Operateur selectedBean = selectedItems.iterator().next();
-                        int value = selectedBean.getId();
-                        try {GestionBDD.changerEtatOperateur(con, value, 1);} catch (SQLException ex){ex.printStackTrace();}
-                        try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
+                    Notification.show("Opérateur "+ selectedBean.getPrenom()+" "+selectedBean.getNom()+" modifié avec succès" , 5000, Notification.Position.TOP_CENTER);
+                }  else {
                     
-                        Notification.show("Etat de l'opérateur "+ selectedBean.getPrenom()+" "+selectedBean.getNom()+" modifié avec succès" , 5000, Notification.Position.TOP_CENTER);
-                    }
+                    int value = selectedBean.getId();
+                    try {GestionBDD.changerEtatOperateur(con, value, 1);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
+                    
+                    Notification.show("Opérateur "+ selectedBean.getPrenom()+" "+selectedBean.getNom()+" modifié avec succès" , 5000, Notification.Position.TOP_CENTER);
+                }
+                }
             });
             
             B1.addClickListener(click -> {
@@ -136,7 +138,7 @@ public class operateur_View extends Div {
             add(
                 titre_View, 
                 new VerticalLayout(grid),
-                new HorizontalLayout(B2, B1) 
+                new HorizontalLayout(B2, B1, B3) 
             );
     }
     
