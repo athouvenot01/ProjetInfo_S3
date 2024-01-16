@@ -62,7 +62,27 @@ public class operateur_View extends Div {
             B3.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SUCCESS);
             
             B3.addClickListener(e->{
+                Set<Operateur> selectedItems = grid.getSelectedItems();
                 
+                if (selectedItems.isEmpty()) {
+                    Notification.show("Aucun opérateur sélectionné", 2000, Notification.Position.TOP_CENTER);
+                
+                } else if ("Actif".equals(comboBox.getValue())) {
+                    
+                    Operateur selectedBean = selectedItems.iterator().next();
+                    int value = selectedBean.getId();
+                    try {GestionBDD.changerEtatOperateur(con, value, 0);} catch (SQLException ex){ex.printStackTrace();}
+                    try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
+                    
+                    Notification.show("Etat de l'opérateur "+ selectedBean.getPrenom()+" "+selectedBean.getNom()+" modifié avec succès" , 5000, Notification.Position.TOP_CENTER);
+                } else {
+                        Operateur selectedBean = selectedItems.iterator().next();
+                        int value = selectedBean.getId();
+                        try {GestionBDD.changerEtatOperateur(con, value, 1);} catch (SQLException ex){ex.printStackTrace();}
+                        try {UpdateOperateurs(con);} catch (SQLException ex){ex.printStackTrace();}
+                    
+                        Notification.show("Etat de l'opérateur "+ selectedBean.getPrenom()+" "+selectedBean.getNom()+" modifié avec succès" , 5000, Notification.Position.TOP_CENTER);
+                    }
             });
             
             B1.addClickListener(click -> {
@@ -132,6 +152,7 @@ public class operateur_View extends Div {
         // Afficher la notification
         notification.open();
     }
+    
     
     
     private VerticalLayout createDialogLayout(Dialog dialog) throws SQLException {

@@ -82,7 +82,11 @@ public class machine_View extends Div {
                 new HorizontalLayout(B2, B1, B3) 
             );
             B3.addClickListener(e-> {
-                //if (etat == O ){
+                if ("Actif".equals(comboBox.getValue())){
+                    //changerEtatOperateur(con, )
+                }
+                
+                
                     
                 
             });
