@@ -432,7 +432,7 @@ public class GestionBDD {
             preparedStatement.setInt(4, etatmachine);
 
             preparedStatement.executeUpdate();
-          
+            System.out.println("Machine créé avec succès !");
         }   
     }
     
